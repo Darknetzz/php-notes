@@ -34,10 +34,21 @@ if (is_file($notesFile)) {
 }
 
 if (isset($_POST['add']) && !empty($_POST['text'])) {
-    array_push($notes, $_POST['text']);
+    $safe_text = htmlspecialchars($_POST['text']);
+    array_push($notes, $safe_text);
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
     alert("Note added successfully.", "success");
+}
+
+if (isset($_POST['update']) && !empty($_POST['text'])) {
+    $safe_text = htmlspecialchars($_POST['text']);
+    $notes[$_POST['id']] = $safe_text;
+    $notes_json = json_encode($notes);
+    file_put_contents($notesFile, $notes_json);
+    echo alert("Note updated successfully.", "success");
+    $edit = "";
+    unset($_GET);
 }
 
 if (!empty($_POST['delall'])) {
@@ -60,15 +71,6 @@ if (isset($_GET['del'])) {
 
 if (isset($_GET['edit'])) {
     $edit = $notes[$_GET['edit']];
-}
-
-if (isset($_POST['update']) && !empty($_POST['text'])) {
-    $notes[$_POST['id']] = $_POST['text'];
-    $notes_json = json_encode($notes);
-    file_put_contents($notesFile, $notes_json);
-    echo alert("Note updated successfully.", "success");
-    $edit = "";
-    unset($_GET);
 }
 ?>
 
