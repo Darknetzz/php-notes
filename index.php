@@ -10,17 +10,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
     <style>
-        .textbox {
-            border: 1px solid #555;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
         .md-preview {
             border: 1px solid #555;
             padding: 10px;
             margin-bottom: 10px;
             background-color: #222;
+        }
+
+        .textarea {
+            background-color: #222;
+        }
+
+        .toolbar {
+            width:100%;
+            background-color: #222;
+            margin-bottom: 10px;
         }
     </style>
 
@@ -31,42 +35,48 @@
 <div class="container" style="margin-top:15px">
 
 <?php
-require_once "functions.php";
+require_once("functions.php");
 $notesFile = "notes.json";
 $notes = getNotes($notesFile);
 $edit  = "";
-$md_preview = "
-<h5>Preview:</h5>
-<div class='md-preview'><span class='text-muted'>When you start typing, you can see the preview here.</span></div>
-";
+$md_preview = "<div class='md-preview'><span class='text-muted'>When you start typing, you can see the preview here.</span></div>";
 
 require_once("formhandler.php");
+
+# Classes
+$addCardClass       = "border-success";
+$addCardTitleClass  = "bg-success bg-opacity-50 text-white";
+$editCardClass      = "border-warning";
+$editCardTitleClass = "bg-warning bg-opacity-50 text-white";
+$notesCardClass     = "border-info";
+$notesCardTitleClass= "bg-info bg-opacity-50 text-white";
 ?>
 
-<div class="card border-success">
-    <h4 class="card-header">Add note</h4>
-    <div class="card-body">
-        <form action="index.php" method="POST">
-                    <div class="editor">
-                        <?= textTools() ?>
-                        <textarea class="form-control" name="text" id="newNote" cols="30" rows="10"><?= $edit ?></textarea>
-                    </div>
+<div id="response"></div>
 
-            <hr>
-            <?= $md_preview ?>
+<div class="card <?= $addCardClass ?>">
+    <h4 class="card-header <?= $addCardTitleClass ?>">Add note</h4>
+    <div class="card-body mb-3">
+        <form action="index.php" method="POST">
+
+            <div class="editor">
+                <div class="form-group">
+                    <input type="text" class="form-control form-control-lg" name="title" placeholder="Title (optional)">
+                </div>
+                <br>
+                <?= textTools() ?>
+                <input type="hidden" name="id" value="<?= uniqid("NOTE_") ?>">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <textarea class="form-control textarea" name="text" id="newNote" cols="30" rows="10"><?= $edit ?></textarea>
+                </div>
+            </div>
+
             <br>
+            <?= $md_preview ?>
+            <hr>
             <div class="btn-group">
-                <?php
-                if (isset($_GET['edit'])) {
-                    echo "
-                    <button type='submit' class='btn btn-success' name='update'>".icon('floppy')." Update</button>
-                    <a href='index.php' class='btn btn-secondary'>".icon('x-circle')." Cancel</a>";
-                } else {
-                    echo '
-                    <button type="submit" class="btn btn-success" name="add">'.icon('plus-circle').' Add</button>
-                    <button type="submit" class="btn btn-danger" name="delall">'.icon('trash').' Delete all</button>';
-                }
-                ?>
+                <button type="submit" class="btn btn-success" name="add"><?= icon('plus-circle') ?> Add</button>
+                <button type="submit" class="btn btn-danger delAll" name="delall"><?= icon('trash') ?> Delete all</button>
             </div>
         </form>
     </div>
@@ -86,57 +96,63 @@ if (!empty($notes)) {
         $modified_datetime  = $value["last_modified_at"];
         $modified           = ($modified_datetime != $created_datetime) ? "<br><span class='text-muted'>Updated ".convertToRelativeTime($modified_datetime)."</span>" : Null;
 
-        echo "<div class='textbox' data-key='$key'>";
+        $title              = (!empty($value["title"])) ? $value["title"] : $value["id"];
 
         /* ───────────────────────────────────────────────────────────────────── */
         /*                              EDIT CONTENT                             */
         /* ───────────────────────────────────────────────────────────────────── */
-            echo "<div class='editContent' data-key='$key' style='display:none;'>
-                <form action='' method='POST'>
-                    <input type='hidden' name='id' value='$key'>
-                    <div class='form-group'>
+            echo "
+            <div class='card editContent ".$editCardClass."' data-key='$key' style='display:none;'>
+            <form action='' method='POST'>
+                <h4 class='card-header ".$editCardTitleClass."'><input type='text' class='form-control form-control-lg' value='$title' name='title'></h4>
+                <div class='card-body'>
+                        <input type='hidden' name='id' value='$key'>
+                        <div class='form-group'>
 
-                        ".textTools($key)."
+                            ".textTools($key)."
 
-                        <textarea class='form-control' name='text' cols='30' rows='10'>$text</textarea>
-                        <div class='form-group mt-2'>
-                            <div class='btn-group'>
-                                <button type='submit' name='update' class='btn btn-success'>".icon('floppy')." Save</button>
-                                <button type='submit' name='del' value='$key' class='btn btn-danger'>".icon('trash')." Delete</button>
-                                <button type='button' class='btn btn-secondary cancelEdit' data-key='$key'>".icon('x-circle')." Cancel</button>
+                            <textarea class='form-control textarea' name='text' cols='30' rows='10'>$text</textarea>
+                            $md_preview
+
+                            <div class='form-group mt-2'>
+                                <div class='btn-group'>
+                                    <button type='submit' name='update' class='btn btn-success'>".icon('floppy')." Save</button>
+                                    <button type='submit' name='del' value='$key' class='btn btn-danger deleteNote'>".icon('trash')." Delete</button>
+                                    <button type='button' class='btn btn-secondary cancelEdit' data-key='$key'>".icon('x-circle')." Cancel</button>
+                                </div>
+                                    $created
+                                    $modified
                             </div>
-                                $created
-                                $modified
                         </div>
+                    </form>
                     </div>
-                    <hr>
-                    $md_preview
-                </form>
             </div>";
 
             /* ───────────────────────────────────────────────────────────────────── */
             /*                            DISPLAY CONTENT                            */
             /* ───────────────────────────────────────────────────────────────────── */
-            echo "<div class='content' data-key='$key'>
-            <form action='' method='POST'>
-                <div class='d-flex justify-content-between align-items-center'>
-                    <span class='note'>$text</span>
+            echo "
+            <div class='card content ".$notesCardClass."' data-key='$key'>
+            <h4 class='card-header ".$notesCardTitleClass."'>$title</h4>
+            <div class='card-body'>
+                <form action='' method='POST'>
+                    <div class='d-flex justify-content-between align-items-center'>
+                        <span class='note'>$text</span>
 
-                    <div>
-                        $created
-                        $modified
-                        <br>
-                        <div class='btn-group'>
-                            <button class='btn btn-primary editNote'>".icon("pen")." Edit</button>
-                            <button class='btn btn-danger' type='submit' name='del' value='$key'>".icon('trash')." Delete</button>
+                        <div>
+                            $created
+                            $modified
+                            <br>
+                            <div class='btn-group'>
+                                <button class='btn btn-primary editNote'>".icon("pen")." Edit</button>
+                                <button class='btn btn-danger deleteNote' type='submit' name='del' value='$key'>".icon('trash')." Delete</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-
+                </form>
             </div>
-
             </div>
+            <br>
         ";
     }
 } else {
@@ -169,7 +185,7 @@ if (!empty($notes)) {
         /* ───────────────────────────────────────────────────────────────────── */
         /*                               MD Preview                              */
         /* ───────────────────────────────────────────────────────────────────── */
-        $("textarea").keyup(function(e) {
+        $("textarea").on("keyup", function(e) {
             text = $(this).val();
             var parsed = marked.parse(text);
             // Replace ASCII smiley with emoji
@@ -203,10 +219,7 @@ if (!empty($notes)) {
             note.hide();
             edit.show();
 
-            parsed = marked.parse(note.find(".note").text());
-            edit.find(".md-preview").html(parsed);
-
-            console.log("Editing note "+key);
+            parsed = marked.parse(note.closest("textarea").text());
         });
         /* ───────────────────────────────────────────────────────────────────── */
 
@@ -221,7 +234,7 @@ if (!empty($notes)) {
                 textarea = $("#newNote")[0];
                 textarea.focus();
             } else {
-                textarea = $(".textbox[data-key='"+key+"']").find("textarea")[0];
+                textarea = $(".content[data-key='"+key+"']").find("textarea")[0];
             }
 
             console.log("Applying "+type+" to note "+key);
@@ -346,6 +359,86 @@ if (!empty($notes)) {
             edit.hide();
         });
         /* ───────────────────────────────────────────────────────────────────── */
+
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                              DELETE NOTE                              */
+        /* ───────────────────────────────────────────────────────────────────── */
+        $(".deleteNote").click(function(e) {
+            e.preventDefault();
+            key = $(this).val();
+            console.log("Deleting note "+key);
+            $(".content[data-key='"+key+"']").remove();
+
+            // Submit form to formhandler.php
+            var closestForm = $(this).closest("form");
+            var id          = $(this).val();
+
+            // Submit AJAX request to formhandler.php
+            $.ajax({
+                type: "POST",
+                url: "api.php",
+                data: {
+                    del: id
+                },
+                success: function(data) {
+                    console.log(data);
+                    $("#response").html(data);
+                }
+            });
+
+        });
+        /* ───────────────────────────────────────────────────────────────────── */
+
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                               DELETE ALL                              */
+        /* ───────────────────────────────────────────────────────────────────── */
+        $(".delAll").click(function(e) {
+            e.preventDefault();
+
+            // Submit form to formhandler.php
+            var closestForm = $(this).closest("form");
+
+            // Submit AJAX request to formhandler.php
+            $.ajax({
+                type: "POST",
+                url: "api.php",
+                data: {
+                    delall: 1
+                },
+                success: function(data) {
+                    console.log(data);
+                    $("#response").html(data);
+                }
+            });
+
+        });
+
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                           DELETE ALL CONFIRM                          */
+        /* ───────────────────────────────────────────────────────────────────── */
+        $(document).on("click", ".delAllConfirm", function(e) {
+            e.preventDefault();
+
+            console.log("Deleting all notes");
+
+            // Submit form to formhandler.php
+            var closestForm = $(this).closest("form");
+
+            // Submit AJAX request to formhandler.php
+            $.ajax({
+                type: "POST",
+                url: "api.php",
+                data: {
+                    delallconfirm: 1
+                },
+                success: function(data) {
+                    console.log(data);
+                    $("#response").html(data);
+                    $(".content").remove();
+                }
+            });
+        });
+
     });
 </script>
 
