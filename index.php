@@ -25,20 +25,15 @@
 <?php
 require_once "functions.php";
 $notesFile = "notes.json";
-$notes = [];
+$notes = getNotes($notesFile);
 $edit  = "";
-
-if (is_file($notesFile)) {
-    $notes = file_get_contents($notesFile);
-    $notes = json_decode($notes, True);
-}
 
 if (isset($_POST['add']) && !empty($_POST['text'])) {
     $safe_text = htmlspecialchars($_POST['text']);
     array_push($notes, $safe_text);
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
-    alert("Note added successfully.", "success");
+    echo alert("Note added successfully.", "success");
 }
 
 if (isset($_POST['update']) && !empty($_POST['text'])) {
@@ -51,7 +46,17 @@ if (isset($_POST['update']) && !empty($_POST['text'])) {
     unset($_GET);
 }
 
-if (!empty($_POST['delall'])) {
+if (isset($_POST['delall']) && !empty($notes)) {
+    echo alert("
+    <h4>".icon('exclamation-triangle')." Are you sure you want to delete <b>all</b> your notes? This cannot be undone!</h4>
+    <hr>
+    <form action='index.php' method='POST'>
+        <button type='submit' class='btn btn-danger' name='delallconfirm'>".icon('trash')." Delete all</button>
+        <a href='index.php' class='btn btn-secondary'>".icon('x-circle')." Cancel</a>
+    </form>", "danger", False);
+}
+
+if (isset($_POST['delallconfirm']) && !empty($notes)) {
     $notes_json = json_encode([]);
     file_put_contents($notesFile, $notes_json);
     echo alert("All notes deleted successfully.", "success");
@@ -100,6 +105,7 @@ if (isset($_GET['edit'])) {
 <hr>
 
 <?php
+$notes = getNotes("notes.json");
 if (!empty($notes)) {
     foreach ($notes as $key => $value) {
         echo "
