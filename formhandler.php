@@ -1,16 +1,29 @@
 <?php
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                  ADD                                  */
+/* ───────────────────────────────────────────────────────────────────── */
 if (isset($_POST['add']) && !empty($_POST['text'])) {
     $safe_text = strip_tags($_POST['text']);
-    array_push($notes, $safe_text);
+    $insert    = [
+        "id"                => uniqid("NOTE_"),
+        "content"           => $safe_text,
+        "created_at"        => time(),
+        "last_modified_at"  => time(),
+    ];
+    array_push($notes, $insert);
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
     echo alert("Note added successfully.", "success");
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                              UPDATE/EDIT                              */
+/* ───────────────────────────────────────────────────────────────────── */
 if (isset($_POST['update']) && !empty($_POST['text'])) {
     $safe_text = strip_tags($_POST['text']);
-    $notes[$_POST['id']] = $safe_text;
+    $notes[$_POST['id']]["content"] = $safe_text;
+    $notes[$_POST['id']]["last_modified_at"] = time();
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
     echo alert("Note updated successfully.", "success");
@@ -18,6 +31,9 @@ if (isset($_POST['update']) && !empty($_POST['text'])) {
     unset($_GET);
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                               DELETE ALL                              */
+/* ───────────────────────────────────────────────────────────────────── */
 if (isset($_POST['delall']) && !empty($notes)) {
     echo alert("
     <h4>".icon('exclamation-triangle')." Are you sure you want to delete <b>all</b> your notes? This cannot be undone!</h4>
@@ -28,12 +44,18 @@ if (isset($_POST['delall']) && !empty($notes)) {
     </form>", "danger", False);
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                           DELETE ALL CONFIRM                          */
+/* ───────────────────────────────────────────────────────────────────── */
 if (isset($_POST['delallconfirm']) && !empty($notes)) {
     $notes_json = json_encode([]);
     file_put_contents($notesFile, $notes_json);
     echo alert("All notes deleted successfully.", "success");
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                               DELETE ONE                              */
+/* ───────────────────────────────────────────────────────────────────── */
 if (isset($_POST['del'])) {
     if (!empty($notes[$_POST['del']])){
         unset($notes[$_POST['del']]);
@@ -46,6 +68,9 @@ if (isset($_POST['del'])) {
     unset($_POST);
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 EDIT?                                 */
+/* ───────────────────────────────────────────────────────────────────── */
 if (isset($_GET['edit'])) {
     $edit = $notes[$_GET['edit']];
 }

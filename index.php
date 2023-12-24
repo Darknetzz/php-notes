@@ -20,6 +20,7 @@
             border: 1px solid #555;
             padding: 10px;
             margin-bottom: 10px;
+            background-color: #222;
         }
     </style>
 
@@ -48,7 +49,7 @@ require_once("formhandler.php");
         <form action="index.php" method="POST">
             <?= textTools() ?>
             <textarea class="form-control" name="text" id="newNote" cols="30" rows="10"><?= $edit ?></textarea>
-            <br>
+            <hr>
             <?= $md_preview ?>
             <br>
             <div class="btn-group">
@@ -73,6 +74,17 @@ require_once("formhandler.php");
 $notes = getNotes("notes.json");
 if (!empty($notes)) {
     foreach ($notes as $key => $value) {
+        $text       = $value["content"];
+        $created    = date("F j, Y H:i", $value["created_at"]);
+        $created    = "<span class='text-muted'>$created</span>";
+        $modified   = (date("F j, Y H:i", $value["last_modified_at"]) != $created) ? "<br>".date("d.m.Y H:i", $value["last_modified_at"]) : "";
+        $modified   = "<span class='text-muted'>$modified</span>";
+        $dates     = "
+            $created
+            <br>
+            $modified
+        ";
+
         echo "
             <div class='textbox' data-key='$key'>
 
@@ -83,7 +95,7 @@ if (!empty($notes)) {
 
                         ".textTools($key)."
 
-                        <textarea class='form-control' name='text' cols='30' rows='10'>$value</textarea>
+                        <textarea class='form-control' name='text' cols='30' rows='10'>$text</textarea>
                         <div class='form-group mt-2'>
                             <div class='btn-group'>
                                 <button type='submit' name='update' class='btn btn-success'>".icon('floppy')." Save</button>
@@ -92,6 +104,7 @@ if (!empty($notes)) {
                             </div>
                         </div>
                     </div>
+                    <hr>
                     $md_preview
                 </form>
             </div>
@@ -99,11 +112,19 @@ if (!empty($notes)) {
             <div class='content' data-key='$key'>
             <form action='' method='POST'>
                 <div class='d-flex justify-content-between align-items-center'>
-                    <span class='note'>$value</span>
+                    <span class='note'>$text</span>
 
-                    <div class='btn-group'>
-                        <button class='btn btn-primary editNote'>".icon("pen")." Edit</button>
-                        <button class='btn btn-danger' type='submit' name='del' value='$key'>".icon('trash')." Delete</button>
+                    <div>
+                        <div class='btn-group'>
+                            <button class='btn btn-primary editNote'>".icon("pen")." Edit</button>
+                            <button class='btn btn-danger' type='submit' name='del' value='$key'>".icon('trash')." Delete</button>
+                        </div>
+                        <br>
+                        <span class='text-muted'>Created ".date('F j, Y H:i', strtotime($created))."</span>";
+                        if (!empty($modified)) {
+                            echo "<span class='text-muted'>Last Updated ".date('F j, Y H:i', strtotime($modified))."</span>";
+                        }
+                        echo "
                     </div>
                 </div>
             </form>
@@ -151,8 +172,8 @@ if (!empty($notes)) {
             parsed = parsed.replace(/:d/gi, "😁");
             parsed = parsed.replace(/:p/gi, "😛");
             parsed = parsed.replace(":(", "😞");
-            
-            $(this).parent().find(".md-preview").html(parsed);
+
+            $(this).parent().parent().find(".md-preview").html(parsed);
         });
 
         /* ───────────────────────────────────────────────────────────────────── */
@@ -176,6 +197,9 @@ if (!empty($notes)) {
 
             note.hide();
             edit.show();
+
+            parsed = marked.parse(note.find(".note").text());
+            edit.find(".md-preview").html(parsed);
 
             console.log("Editing note "+key);
         });
