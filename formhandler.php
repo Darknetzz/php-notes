@@ -8,8 +8,8 @@ if (isset($_POST['add']) && !empty($_POST['text'])) {
     $insert    = [
         "id"                => uniqid("NOTE_"),
         "content"           => $safe_text,
-        "created_at"        => time(),
-        "last_modified_at"  => time(),
+        "created_at"        => date('Y-m-d H:i:s'),
+        "last_modified_at"  => date('Y-m-d H:i:s'),
     ];
     array_push($notes, $insert);
     $notes_json = json_encode($notes);
@@ -23,7 +23,7 @@ if (isset($_POST['add']) && !empty($_POST['text'])) {
 if (isset($_POST['update']) && !empty($_POST['text'])) {
     $safe_text = strip_tags($_POST['text']);
     $notes[$_POST['id']]["content"] = $safe_text;
-    $notes[$_POST['id']]["last_modified_at"] = time();
+    $notes[$_POST['id']]["last_modified_at"] = date('Y-m-d H:i:s');
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
     echo alert("Note updated successfully.", "success");

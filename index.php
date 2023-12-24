@@ -43,12 +43,15 @@ $md_preview = "
 require_once("formhandler.php");
 ?>
 
-<div class="card">
-    <h3 class="card-header">Notes</h3>
+<div class="card border-success">
+    <h4 class="card-header">Add note</h4>
     <div class="card-body">
         <form action="index.php" method="POST">
-            <?= textTools() ?>
-            <textarea class="form-control" name="text" id="newNote" cols="30" rows="10"><?= $edit ?></textarea>
+                    <div class="editor">
+                        <?= textTools() ?>
+                        <textarea class="form-control" name="text" id="newNote" cols="30" rows="10"><?= $edit ?></textarea>
+                    </div>
+
             <hr>
             <?= $md_preview ?>
             <br>
@@ -68,27 +71,27 @@ require_once("formhandler.php");
         </form>
     </div>
 </div>
+
 <hr>
 
 <?php
 $notes = getNotes("notes.json");
 if (!empty($notes)) {
     foreach ($notes as $key => $value) {
-        $text       = $value["content"];
-        $created    = date("F j, Y H:i", $value["created_at"]);
-        $created    = "<span class='text-muted'>$created</span>";
-        $modified   = (date("F j, Y H:i", $value["last_modified_at"]) != $created) ? "<br>".date("d.m.Y H:i", $value["last_modified_at"]) : "";
-        $modified   = "<span class='text-muted'>$modified</span>";
-        $dates     = "
-            $created
-            <br>
-            $modified
-        ";
+        $text               = $value["content"];
 
-        echo "
-            <div class='textbox' data-key='$key'>
+        $created_datetime   = $value["created_at"];
+        $created            = "<br><span class='text-muted'>Created ".convertToRelativeTime($created_datetime)."</span>";
 
-            <div class='editContent' data-key='$key' style='display:none;'>
+        $modified_datetime  = $value["last_modified_at"];
+        $modified           = ($modified_datetime != $created_datetime) ? "<br><span class='text-muted'>Updated ".convertToRelativeTime($modified_datetime)."</span>" : Null;
+
+        echo "<div class='textbox' data-key='$key'>";
+
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                              EDIT CONTENT                             */
+        /* ───────────────────────────────────────────────────────────────────── */
+            echo "<div class='editContent' data-key='$key' style='display:none;'>
                 <form action='' method='POST'>
                     <input type='hidden' name='id' value='$key'>
                     <div class='form-group'>
@@ -102,29 +105,31 @@ if (!empty($notes)) {
                                 <button type='submit' name='del' value='$key' class='btn btn-danger'>".icon('trash')." Delete</button>
                                 <button type='button' class='btn btn-secondary cancelEdit' data-key='$key'>".icon('x-circle')." Cancel</button>
                             </div>
+                                $created
+                                $modified
                         </div>
                     </div>
                     <hr>
                     $md_preview
                 </form>
-            </div>
+            </div>";
 
-            <div class='content' data-key='$key'>
+            /* ───────────────────────────────────────────────────────────────────── */
+            /*                            DISPLAY CONTENT                            */
+            /* ───────────────────────────────────────────────────────────────────── */
+            echo "<div class='content' data-key='$key'>
             <form action='' method='POST'>
                 <div class='d-flex justify-content-between align-items-center'>
                     <span class='note'>$text</span>
 
                     <div>
+                        $created
+                        $modified
+                        <br>
                         <div class='btn-group'>
                             <button class='btn btn-primary editNote'>".icon("pen")." Edit</button>
                             <button class='btn btn-danger' type='submit' name='del' value='$key'>".icon('trash')." Delete</button>
                         </div>
-                        <br>
-                        <span class='text-muted'>Created ".date('F j, Y H:i', strtotime($created))."</span>";
-                        if (!empty($modified)) {
-                            echo "<span class='text-muted'>Last Updated ".date('F j, Y H:i', strtotime($modified))."</span>";
-                        }
-                        echo "
                     </div>
                 </div>
             </form>
