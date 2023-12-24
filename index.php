@@ -85,7 +85,7 @@ if (isset($_GET['edit'])) {
                 if (isset($_GET['edit'])) {
                     echo "
                     <input type='hidden' name='id' value='$_GET[edit]'>
-                    <button type='submit' class='btn btn-primary' name='update'>".icon('floppy')." Update</button>
+                    <button type='submit' class='btn btn-success' name='update'>".icon('floppy')." Update</button>
                     <a href='index.php' class='btn btn-secondary'>".icon('x-circle')." Cancel</a>";
                 } else {
                     echo '
