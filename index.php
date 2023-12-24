@@ -79,8 +79,10 @@ if (isset($_POST['update']) && !empty($_POST['text'])) {
             <div class="btn-group">
                 <?php
                 if (isset($_GET['edit'])) {
-                    echo "<input type='hidden' name='id' value='$_GET[edit]'>";
-                    echo "<input type='submit' class='btn btn-primary' name='update' value='Update'>";
+                    echo "
+                    <input type='hidden' name='id' value='$_GET[edit]'>
+                    <input type='submit' class='btn btn-primary' name='update' value='Update'>
+                    <a href='index.php' class='btn btn-secondary'>Cancel</a>";
                 } else {
                     echo '
                     <input type="submit" class="btn btn-success" name="add" value="Add">
