@@ -3,17 +3,14 @@
 <html>
 <head>
     <title>NOTES</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script
-    src="https://code.jquery.com/jquery-3.2.1.min.js"
-    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-    crossorigin="anonymous">
-    </script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
     <style>
         .textbox {
-            border: 1px solid #ccc;
+            border: 1px solid #555;
             padding: 10px;
             margin-bottom: 10px;
         }
@@ -21,11 +18,12 @@
 
 </head>
 
-<body style="background-color:#333;color:white;">
+<body data-bs-theme="dark">
 
 <div class="container" style="margin-top:5px">
 
 <?php
+require_once "functions.php";
 $notesFile = "notes.json";
 $notes = [];
 $edit  = "";
@@ -39,20 +37,24 @@ if (isset($_POST['add']) && !empty($_POST['text'])) {
     array_push($notes, $_POST['text']);
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
-    echo "<div class='alert alert-success'>Note added successfully.</div>";
+    alert("Note added successfully.", "success");
 }
 
 if (!empty($_POST['delall'])) {
     $notes_json = json_encode([]);
     file_put_contents($notesFile, $notes_json);
-    echo "<div class='alert alert-success'>All notes deleted successfully.</div>";
+    echo alert("All notes deleted successfully.", "success");
 }
 
 if (isset($_GET['del'])) {
-    unset($notes[$_GET['del']]);
-    $notes_json = json_encode($notes);
-    file_put_contents($notesFile, $notes_json);
-    echo "<div class='alert alert-success'>Note deleted successfully.</div>";
+    if (!empty($notes[$_GET['del']])){
+        unset($notes[$_GET['del']]);
+        $notes_json = json_encode($notes);
+        file_put_contents($notesFile, $notes_json);
+        echo alert("Note deleted successfully.", "success");
+    } else {
+        echo alert("Note not found.", "warning");
+    }
     unset($_GET);
 }
 
@@ -64,7 +66,7 @@ if (isset($_POST['update']) && !empty($_POST['text'])) {
     $notes[$_POST['id']] = $_POST['text'];
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
-    echo "<div class='alert alert-success'>Note updated successfully.</div>";
+    echo alert("Note updated successfully.", "success");
     $edit = "";
     unset($_GET);
 }
@@ -81,12 +83,12 @@ if (isset($_POST['update']) && !empty($_POST['text'])) {
                 if (isset($_GET['edit'])) {
                     echo "
                     <input type='hidden' name='id' value='$_GET[edit]'>
-                    <input type='submit' class='btn btn-primary' name='update' value='Update'>
-                    <a href='index.php' class='btn btn-secondary'>Cancel</a>";
+                    <button type='submit' class='btn btn-primary' name='update'>".icon('floppy')." Update</button>
+                    <a href='index.php' class='btn btn-secondary'>".icon('x-circle')." Cancel</a>";
                 } else {
                     echo '
-                    <input type="submit" class="btn btn-success" name="add" value="Add">
-                    <input type="submit" class="btn btn-danger" name="delall" value="Delete all">';
+                    <button type="submit" class="btn btn-success" name="add">'.icon('plus-circle').' Add</button>
+                    <button type="submit" class="btn btn-danger" name="delall">'.icon('trash').' Delete all</button>';
                 }
                 ?>
             </div>
@@ -103,13 +105,13 @@ if (!empty($notes)) {
         $value
         <hr>
         <div class='btn-group'>
-        <a href='?edit=$key' class='btn btn-primary'>Edit</a>
-        <a href='?del=$key' class='btn btn-danger'>Delete</a>
+        <a href='?edit=$key' class='btn btn-primary'>".icon("pen")." Edit</a>
+        <a href='?del=$key' class='btn btn-danger'>".icon('trash')." Delete</a>
         </div>
         </div>";
     }
 } else {
-    echo "<div class='alert alert-warning'>Nothing added yet.</div>";
+    alert("Nothing added yet.", "warning");
 }
 ?>
 </div>
