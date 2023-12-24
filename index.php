@@ -15,6 +15,12 @@
             padding: 10px;
             margin-bottom: 10px;
         }
+
+        .md-preview {
+            border: 1px solid #555;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 
 </head>
@@ -28,6 +34,10 @@ require_once "functions.php";
 $notesFile = "notes.json";
 $notes = getNotes($notesFile);
 $edit  = "";
+$md_preview = "
+<h5>Preview:</h5>
+<div class='md-preview'><span class='text-muted'>When you start typing, you can see the preview here.</span></div>
+";
 
 require_once("formhandler.php");
 ?>
@@ -38,6 +48,8 @@ require_once("formhandler.php");
         <form action="index.php" method="POST">
             <?= textTools() ?>
             <textarea class="form-control" name="text" id="newNote" cols="30" rows="10"><?= $edit ?></textarea>
+            <br>
+            <?= $md_preview ?>
             <br>
             <div class="btn-group">
                 <?php
@@ -80,6 +92,7 @@ if (!empty($notes)) {
                             </div>
                         </div>
                     </div>
+                    $md_preview
                 </form>
             </div>
 
@@ -113,6 +126,9 @@ if (!empty($notes)) {
 <script>
     $(document).ready(function() {
 
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                          Submit on CTRL+ENTER                         */
+        /* ───────────────────────────────────────────────────────────────────── */
         $("textarea").keydown(function(e) {
             if (e.ctrlKey && e.keyCode == 13) {
                 var closestForm = $(this).closest("form");
@@ -122,6 +138,21 @@ if (!empty($notes)) {
                 closestForm.submit();
                 console.log("Submitting form");
             }
+        });
+
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                               MD Preview                              */
+        /* ───────────────────────────────────────────────────────────────────── */
+        $("textarea").keyup(function(e) {
+            text = $(this).val();
+            var parsed = marked.parse(text);
+            // Replace ASCII smiley with emoji
+            parsed = parsed.replace(":)", "😊");
+            parsed = parsed.replace(/:d/gi, "😁");
+            parsed = parsed.replace(/:p/gi, "😛");
+            parsed = parsed.replace(":(", "😞");
+            
+            $(this).parent().find(".md-preview").html(parsed);
         });
 
         /* ───────────────────────────────────────────────────────────────────── */
