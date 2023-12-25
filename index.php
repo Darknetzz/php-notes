@@ -13,48 +13,34 @@
 </head>
 
 <?php
-require_once("functions.php");
-require_once("config.php");
+require_once("includes/functions.php");
+require_once("includes/config.php");
 ?>
 
 <body data-bs-theme="dark">
 
-<?php include_once("nav.php"); ?>
+<?php include_once("includes/nav.php"); ?>
 
 <!-- NOTE: CONTAINER -->
 <div class="container" style="margin-top:15px">
 
-<?php
-require_once("formhandler.php");
-
-# Classes
-$addCardClass       = "border-success";
-$addCardTitleClass  = "bg-success bg-opacity-50 text-white";
-$editCardClass      = "border-warning";
-$editCardTitleClass = "bg-warning bg-opacity-50 text-white";
-$notesCardClass     = "border-info";
-$notesCardTitleClass= "bg-info bg-opacity-50 text-white";
-?>
-
 <div id="response"></div>
 
-<?php require_once("pages/home.php"); ?>
+<?php require_once("includes/breadcrumbs.php"); ?>
 
-<br>
-
-<?php require_once("pages/addNote.php"); ?>
-
-<br>
-
-<?php require_once("pages/allNotes.php"); ?>
-
+<div class="pages">
+<?php
+foreach (glob("pages/*.php") as $filename) {
+    require_once($filename);
+}
+?>
 </div>
 
 
-
+</div>
 </body>
 
-<?php require_once("js.php"); ?>
+<?php require_once("includes/js.php"); ?>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 </html>

@@ -53,14 +53,23 @@ if (isset($_POST['add']) && !empty($_POST['text']) && !empty($_POST['id'])) {
 /*                               DELETE ONE                              */
 /* ───────────────────────────────────────────────────────────────────── */
 if (isset($_POST['del'])) {
-    if (!empty($notes[$_POST['del']])){
-        unset($notes[$_POST['del']]);
-        $notes_json = json_encode($notes);
-        file_put_contents($notesFile, $notes_json);
-        echo alert("Note deleted successfully.", "success");
-    } else {
-        echo alert("Note not found.", "warning");
+
+    $id = strip_tags($_POST['del']);
+
+    if (empty($id)) {
+        echo alert("No note selected.", "warning");
+        return False;
     }
+
+    if (empty($notes[$id])) {
+        echo alert("Note ".badge($id)." not found.", "warning");
+        return False;
+    }
+
+    unset($notes[$id]);
+    $notes_json = json_encode($notes);
+    file_put_contents($notesFile, $notes_json);
+    echo alert("Note deleted successfully.", "success");
     unset($_POST);
 }
 
@@ -94,5 +103,29 @@ if (isset($_GET['genid'])) {
     echo uniqid();
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                              UPDATE/EDIT                              */
+/* ───────────────────────────────────────────────────────────────────── */
+if (isset($_POST['update']) && !empty($_POST['text'])) {
+    $safe_title                                 = strip_tags($_POST['title']);
+    $safe_text                                  = strip_tags($_POST['text']);
+    $notes[$_POST['id']]["title"]               = $safe_title;
+    $notes[$_POST['id']]["content"]             = $safe_text;
+    $notes[$_POST['id']]["last_modified_at"]    = date('Y-m-d H:i:s');
+    $notes_json = json_encode($notes);
+    file_put_contents($notesFile, $notes_json);
+    echo alert("Note updated successfully.", "success");
+    $edit = "";
+    unset($_GET);
+}
+
+
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 EDIT?                                 */
+/* ───────────────────────────────────────────────────────────────────── */
+if (isset($_GET['edit'])) {
+    $edit = $notes[$_GET['edit']];
+}
 
 ?>

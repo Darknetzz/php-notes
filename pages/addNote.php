@@ -23,9 +23,6 @@
                 <?= $md_preview ?>
                     <button type="button" class="btn btn-success addNote btn-block"><?= icon('floppy') ?> Save note</button>
                     <button type="button" class="btn btn-secondary toggleEditor btn-block"><?= icon('eye-slash') ?> Cancel</button>
-    
-    
-                
             </form>
         </div>
     </div>

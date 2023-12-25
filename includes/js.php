@@ -8,6 +8,8 @@
         var addNoteCard = $("#addNoteCard");
         var addNoteForm = $("#addNoteForm");
         var allNotes    = $("#allNotes");
+        var responseDiv = $("#response");
+        var breadcrumbs = $(".breadcrumb");
 
         /* ───────────────────────────────────────────────────────────────────── */
         /*                          Submit on CTRL+ENTER                         */
@@ -217,7 +219,7 @@
             // Submit AJAX request to formhandler.php
             $.ajax({
                 type: "POST",
-                url: "api.php",
+                url: "includes/api.php",
                 data: {
                     del: id
                 },
@@ -242,7 +244,7 @@
             // Submit AJAX request to formhandler.php
             $.ajax({
                 type: "POST",
-                url: "api.php",
+                url: "includes/api.php",
                 data: {
                     delall: 1
                 },
@@ -268,7 +270,7 @@
             // Submit AJAX request to formhandler.php
             $.ajax({
                 type: "POST",
-                url: "api.php",
+                url: "includes/api.php",
                 data: {
                     delallconfirm: 1
                 },
@@ -299,7 +301,7 @@
             // Submit AJAX request to formhandler.php
             $.ajax({
                 type: "POST",
-                url: "api.php",
+                url: "includes/api.php",
                 data: {
                     id: id,
                     add: id,
@@ -356,47 +358,76 @@
         // This is supposed to hide everything, and then show the desired page,
         // as opposed to toggleBtn, which toggles the visibility of the target.
         /* ───────────────────────────────────────────────────────────────────── */
-        function navigate(e) {
-            e.preventDefault();
 
-            
-            var icon        = $(this).find("i").html();
-            var text        = $(this).text();
-            
-            var toggle_on   = icon+" "+text+" <?= icon('eye-slash') ?>";
-            var toggle_off  = icon+" "+text+" <?= icon('eye') ?>";
-            var on_class    = "text-success";
-            var off_class   = "text-secondary";
-            
-            $(".navBtn").removeClass(on_class);
-            $(this).addClass(on_class).removeClass(off_class);
-            
+        $(".navBtn").on("click", function(e) {
+            e.preventDefault();
+            navigate($(this).data("target"));
+        });
+
+        /* ────────────────────────────── navigate ───────────────────────────── */
+        function navigate(target, button = null) {
+
+            // Add current page to breadcrumb
+            var current_page = $(".page:visible").attr("id");
+            breadcrumbs.append("<li class='breadcrumb-item'><a href='#"+current_page+"'>"+current_page+"</li>");
+
             $(".page").hide();
-            var target      = $(this).data("target");
-            var target_obj  = $(target);
+            $(".navBtn").removeClass(on_class);
+
+            if (button != null) {
+                var icon        = button.find("i").html();
+                var text        = button.text();
+
+                var toggle_on   = icon+" "+text+" <?= icon('eye-slash') ?>";
+                var toggle_off  = icon+" "+text+" <?= icon('eye') ?>";
+                var on_class    = "text-success";
+                var off_class   = "text-secondary";
+
+                button.removeClass(off_class);
+                button.addClass(on_class);
+            }
             
+            var target_obj  = $(target);
+
+            // Update url with hashtag
+            window.location.hash = target;
+
             console.log("Navigating to "+target);
 
             // check if target object exists
             if (target_obj.length == 0) {
-                $("#response").html("Target object "+target+" does not exist");
+                $("#404").show();
+                // $("#response").html("Target object "+target+" does not exist");
                 console.log("Target object "+target+" does not exist");
                 return;
             }
-            $(target_obj).show();
+
+            target_obj.show();
         }
 
-        $(".navBtn").on("click", function(e) {
-            navigate(e);
-        });
+
 
         /* ───────────────────────────────────────────────────────────────────── */
 
-        // Hide all .page initially
-        $(".page").hide();
+        // Check if a clicked link is a hash
+        $("a").on("click", function(e) {
+            var href = $(this).attr("href");
+            if (href[0] == "#") {
+                e.preventDefault();
+                console.log("Navigating to "+href);
+                navigate(href);
+            }
+        });
 
-        // Except home
-        $("#home").show();
+
+        if (window.hash) {
+            console.log("Navigating to "+window.hash);
+            $(".navBtn[data-target='"+window.hash+"']").click();
+        } else {
+            // Except home
+            $("#home").show();
+        }
+
 
         });
 

@@ -24,7 +24,7 @@
                 label: "Add note", 
                 icon: "plus-circle", 
                 color: "light", 
-                class: "navBtn addNote", 
+                class: "navBtn", 
                 attrs: ["data-target" => "#addNoteCard"]
             )
             .
@@ -48,7 +48,7 @@
     </div>
 
     
-    <div>
+    <!-- <div>
         <h4 class="leftMenu-title">Show/Hide</h4>
         <ul class="leftMenu-list list-group">
             <?php
@@ -56,18 +56,18 @@
                 navItem(
                 label: "All notes", 
                 icon: "list-ul", 
-                class: "toggleBtn showAllNotes", 
+                class: "navBtn showAllNotes", 
                 attrs: ["data-target" => "#allNotes"]
                 ).
                 navItem(
                 label: "My notes", 
                 icon: "person-fill", 
-                class: "toggleBtn myNotes", 
+                class: "navBtn myNotes", 
                 attrs: ["data-target" => "#myNotes"]
                 );
             ?>
         </ul>
-    </div>
+    </div> -->
 
 
     <div>

@@ -1,4 +1,4 @@
-<div class="page" id="allNotes" style="display:none;">
+<div class="page" id="allNotes">
 
 <?php
 $notes = getNotes("notes.json");
@@ -32,8 +32,8 @@ if (!empty($notes)) {
 
                                 <div class='form-group mt-2'>
                                     <div class='btn-group'>
-                                        <button type='submit' name='update' class='btn btn-success'>".icon('floppy')." Save</button>
-                                        <button type='submit' name='del' value='$key' class='btn btn-danger deleteNote'>".icon('trash')." Delete</button>
+                                        <button type='button' name='update' class='btn btn-success'>".icon('floppy')." Save</button>
+                                        <button type='button' name='del' value='$key' class='btn btn-danger deleteNote'>".icon('trash')." Delete</button>
                                         <button type='button' class='btn btn-secondary cancelEdit' data-key='$key'>".icon('x-circle')." Cancel</button>
                                     </div>
                                         $created
