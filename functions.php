@@ -1,6 +1,6 @@
 <?php
-function icon(string $icon, float $px = 15) {
-    return "<i class='bi bi-$icon' style='font-size:{$size}px'></i>";
+function icon(string $icon, float $size = 15) {
+    return "<i class='bi bi-$icon' style='font-size:".$size."px'></i>";
 }
 
 function alert(string $text, string $type = "success", bool $showicon = True) {
@@ -14,15 +14,31 @@ function alert(string $text, string $type = "success", bool $showicon = True) {
     return "<div class='alert alert-$type'>$icon $text</div>";
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                getNotes                               */
+/* ───────────────────────────────────────────────────────────────────── */
 function getNotes(string $notesFile = "notes.json") {
     $notes = [];
-    if (is_file($notesFile)) {
-        $notes = file_get_contents($notesFile);
-        $notes = json_decode($notes, True);
+
+    if (!is_file($notesFile) || filesize($notesFile) == 0) {
+        file_put_contents($notesFile, "[]");
+        echo alert("Notes file '$notesFile' not found. A new one has been created.", "warning");
     }
+
+    $notes_json = file_get_contents($notesFile);
+
+    if (!json_validate($notes_json)) {
+        echo alert("Error: <b>$notesFile</b> is not a valid JSON file.", "danger");
+        die();
+    }
+
+    $notes = json_decode($notes_json, True);
     return $notes;
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                               textTools                               */
+/* ───────────────────────────────────────────────────────────────────── */
 function textTools(string $key = "new") {
     $class = "btn btn-default border-info text-info textTools";
     return "
@@ -51,7 +67,11 @@ function textTools(string $key = "new") {
 /* ───────────────────────────────────────────────────────────────────── */
 /*                         convertToRelativeTime                         */
 /* ───────────────────────────────────────────────────────────────────── */
-function convertToRelativeTime(string $date) {
+function convertToRelativeTime(string $date = Null) {
+    if ($date == Null) {
+        return "Never";
+    }
+
     $timestamp = strtotime($date);
     $currentTime = time();
     $difference = $currentTime - $timestamp;
@@ -72,4 +92,33 @@ function convertToRelativeTime(string $date) {
     return "$difference $periods[$i] ago";
 }
 
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 badge                                 */
+/* ───────────────────────────────────────────────────────────────────── */
+function badge(string $text, string $type = "info", int $size = 16) {
+    return "<span class='badge text-bg-$type' style='font-size:".$size."px;'>$text</span>";
+}
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                navItem                                */
+/* ───────────────────────────────────────────────────────────────────── */
+function navItem(
+        string $text,
+        string $icon,
+        string $color = "light",
+        string $class = Null,
+        array  $data  = [],
+        string $href  = Null
+    ) {
+
+        $href   = ($href == Null) ? "#$text" : $href;
+        $color  = (!empty($color)) ? $color : "dark";
+        $class  = "list-group-item list-group-item-$color $class leftMenu-list-item";
+        $data = (count($data) > 0) ? implode(" ", array_map(function($key, $value) {
+            return "data-$key='$value'";
+        }, array_keys($data), $data)) : null;
+
+    return "<a href='$href' class='$class' $data>".icon($icon)." $text</a>";
+}
 ?>

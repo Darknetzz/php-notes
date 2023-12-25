@@ -2,12 +2,22 @@
 
 require_once("functions.php");
 $notesFile = "notes.json";
-$notes = getNotes($notesFile);
+$notes     = getNotes($notesFile);
+$notes     = (is_array($notes) && !empty($notes) ? $notes : []);
 
-if (empty($notes)) {
-    echo alert("No notes found.", "warning");
-    die();
-}
+// if (!is_array($notes)) {
+//     $notes      = [];
+//     $notes_json = json_encode($notes);
+//     file_put_contents($notesFile, $notes_json);
+//     echo alert("Notes file was not a valid array - it has been reconstructed.", "success");
+// }
+// if (!is_array($notes)) {
+//     $notes = [];
+// }
+
+// if (empty($notes)) {
+
+// }
 
 /* ───────────────────────────────────────────────────────────────────── */
 /*                                  ADD                                  */
@@ -18,11 +28,11 @@ if (isset($_POST['add']) && !empty($_POST['text']) && !empty($_POST['id'])) {
     foreach ($notes as $note) {
         if ($uniqid == $note['id']) {
             echo alert("Note already exists.", "warning");
-            return false;
+            return False;
         }
     }
     
-    $title      = strip_tags($_POST['title']);
+    $title      = (!empty($_POST['title']) ? strip_tags($_POST['title']) : Null);
     $safe_text  = strip_tags($_POST['text']);
 
     $insert    = [
@@ -32,6 +42,7 @@ if (isset($_POST['add']) && !empty($_POST['text']) && !empty($_POST['id'])) {
         "created_at"        => date('Y-m-d H:i:s'),
         "last_modified_at"  => date('Y-m-d H:i:s'),
     ];
+
     array_push($notes, $insert);
     $notes_json = json_encode($notes);
     file_put_contents($notesFile, $notes_json);
@@ -74,6 +85,13 @@ if (isset($_POST['delallconfirm']) && !empty($notes)) {
     $notes_json = json_encode([]);
     file_put_contents($notesFile, $notes_json);
     echo alert("All notes deleted successfully.", "success");
+}
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 GET ID                                */
+/* ───────────────────────────────────────────────────────────────────── */
+if (isset($_GET['genid'])) {
+    echo uniqid();
 }
 
 
