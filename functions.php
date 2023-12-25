@@ -119,7 +119,9 @@ function navItem(
         string $href  = Null
     ) {
 
+        $href   = (isset($attrs["target"]) ? "#".$attrs["target"] : $href);
         $href   = ($href == Null) ? "#$label" : $href;
+        
         $color  = (!empty($color)) ? $color : "dark";
         $class  = "list-group-item list-group-item-$color $class leftMenu-list-item text-white text-decoration-none";
         $attrs = (count($attrs) > 0) ? implode(" ", array_map(function($key, $value) {

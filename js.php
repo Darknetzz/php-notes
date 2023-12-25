@@ -53,8 +53,8 @@
         $(".editNote").click(function(e) {
             e.preventDefault();
 
-            key     = $(this).closest(".displayContent").data("key");
-            note    = $(".displayContent[data-key='"+key+"']");
+            key     = $(this).closest(".page").data("key");
+            note    = $(".page[data-key='"+key+"']");
             edit    = $(".editContent[data-key='"+key+"']");
 
             note.hide();
@@ -75,7 +75,7 @@
                 textarea = $("#newNote")[0];
                 textarea.focus();
             } else {
-                textarea = $(".displayContent[data-key='"+key+"']").find("textarea")[0];
+                textarea = $(".page[data-key='"+key+"']").find("textarea")[0];
             }
 
             console.log("Applying "+type+" to note "+key);
@@ -193,7 +193,7 @@
             e.preventDefault();
             key = $(this).data("key");
 
-            note = $(".displayContent[data-key='"+key+"']");
+            note = $(".page[data-key='"+key+"']");
             edit = $(".editContent[data-key='"+key+"']");
 
             note.show();
@@ -208,7 +208,7 @@
             e.preventDefault();
             key = $(this).val();
             console.log("Deleting note "+key);
-            $(".displayContent[data-key='"+key+"']").remove();
+            $(".page[data-key='"+key+"']").remove();
 
             // Submit form to formhandler.php
             var closestForm = $(this).closest("form");
@@ -275,7 +275,7 @@
                 success: function(data) {
                     console.log(data);
                     $("#response").html(data);
-                    $(".displayContent").remove();
+                    $(".page").remove();
                 }
             });
         });
@@ -356,12 +356,13 @@
         // This is supposed to hide everything, and then show the desired page,
         // as opposed to toggleBtn, which toggles the visibility of the target.
         /* ───────────────────────────────────────────────────────────────────── */
-        $(".navBtn").on("click", function(e) {
+        function navigate(e) {
             e.preventDefault();
 
+            
             var icon        = $(this).find("i").html();
             var text        = $(this).text();
-
+            
             var toggle_on   = icon+" "+text+" <?= icon('eye-slash') ?>";
             var toggle_off  = icon+" "+text+" <?= icon('eye') ?>";
             var on_class    = "text-success";
@@ -369,15 +370,29 @@
             
             $(".navBtn").removeClass(on_class);
             $(this).addClass(on_class).removeClass(off_class);
-
+            
             $(".page").hide();
             var target      = $(this).data("target");
             var target_obj  = $(target);
+            
             console.log("Navigating to "+target);
+
+            // check if target object exists
+            if (target_obj.length == 0) {
+                $("#response").html("Target object "+target+" does not exist");
+                console.log("Target object "+target+" does not exist");
+                return;
+            }
             $(target_obj).show();
+        }
+
+        $(".navBtn").on("click", function(e) {
+            navigate(e);
         });
 
-        // Hide all .displayContent initially
+        /* ───────────────────────────────────────────────────────────────────── */
+
+        // Hide all .page initially
         $(".page").hide();
 
         // Except home

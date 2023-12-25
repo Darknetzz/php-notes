@@ -24,7 +24,7 @@
                 label: "Add note", 
                 icon: "plus-circle", 
                 color: "light", 
-                class: "navBtn toggleBtn", 
+                class: "navBtn addNote", 
                 attrs: ["data-target" => "#addNoteCard"]
             )
             .

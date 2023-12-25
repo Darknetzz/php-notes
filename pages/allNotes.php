@@ -1,4 +1,4 @@
-<div class="page" id="allNotes">
+<div class="page" id="allNotes" style="display:none;">
 
 <?php
 $notes = getNotes("notes.json");
@@ -18,7 +18,7 @@ if (!empty($notes)) {
         /*                              EDIT CONTENT                             */
         /* ───────────────────────────────────────────────────────────────────── */
             echo "
-                <div class='card editContent ".$editCardClass."' data-key='$key' style='display:none;'>
+                <div class='card editContent ".$editCardClass."' data-key='$key'>
                 <form action='' method='POST'>
                     <h4 class='card-header ".$editCardTitleClass."'><input type='text' class='form-control form-control-lg' value='$title' name='title'></h4>
                     <div class='card-body'>
@@ -49,7 +49,7 @@ if (!empty($notes)) {
             /*                            DISPLAY CONTENT                            */
             /* ───────────────────────────────────────────────────────────────────── */
             echo "
-                <div class='card displayContent ".$notesCardClass."' data-key='$key'>
+                <div class='card page ".$notesCardClass."' data-key='$key'>
                 <h4 class='card-header ".$notesCardTitleClass."'>
                     <div class='d-flex justify-content-between align-items-center'>
                         $title
