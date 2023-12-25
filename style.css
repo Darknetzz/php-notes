@@ -1,3 +1,20 @@
+:root {
+    --main-color: #ff6600;
+    --main-color-light: #f90;
+    --main-color-dark: #f60;
+    --main-color-darker: #e55;
+    --main-color-darkest: #d40;
+    --main-color-lighter: #ff7a33;
+    --main-color-lightest: #ff8c66;
+    --main-color-lightest2: #ff9e99;
+    --main-color-lightest3: #ffb1cc;
+    --main-color-lightest4: #ffc3ff;
+}
+
+.page {
+    display: none;
+}
+
 .md-preview {
     border: 1px solid #555;
     padding: 10px;
@@ -15,6 +32,16 @@
     margin-bottom: 10px;
 }
 
+.btn-orange {
+    color: white;
+    background-color: #ff6600;
+}
+
+.btn-lorange {
+    color: white;
+    background-color: #f90;
+}
+
 .leftMenu {
     position: fixed;
     top: 0;
@@ -27,17 +54,19 @@
 }
 
 .leftMenu-title {
-    background-color: #222;
     font-size: 20px;
     margin-bottom: 10px;
-    border-bottom: #222;
+    padding-bottom: 10px;
     text-align: center;
+    border-bottom: 0.5px solid #555;
 }
 
 .leftMenu-list-item {
-    text-align: center;
+    text-align: left;
 }
 
 .leftMenu-list-item:hover {
-    background-color: #555;
+    background-color: rgb(128, 128, 128);
+    /* background-color: var(--main-color); */
+    border: 0.5px solid var(--main-color);
 }

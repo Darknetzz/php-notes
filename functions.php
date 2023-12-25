@@ -1,8 +1,15 @@
 <?php
-function icon(string $icon, float $size = 15) {
-    return "<i class='bi bi-$icon' style='font-size:".$size."px'></i>";
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                  icon                                 */
+/* ───────────────────────────────────────────────────────────────────── */
+function icon(string $icon, float $size = 15, string $color = "danger") {
+    return "<i class='bi bi-$icon' style='color:$color;font-size:".$size."px'></i>";
 }
 
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 alert                                 */
+/* ───────────────────────────────────────────────────────────────────── */
 function alert(string $text, string $type = "success", bool $showicon = True) {
     $icon = "";
     if ($showicon) {
@@ -104,21 +111,21 @@ function badge(string $text, string $type = "info", int $size = 16) {
 /*                                navItem                                */
 /* ───────────────────────────────────────────────────────────────────── */
 function navItem(
-        string $text,
+        string $label,
         string $icon,
         string $color = "light",
         string $class = Null,
-        array  $data  = [],
+        array  $attrs  = [],
         string $href  = Null
     ) {
 
-        $href   = ($href == Null) ? "#$text" : $href;
+        $href   = ($href == Null) ? "#$label" : $href;
         $color  = (!empty($color)) ? $color : "dark";
-        $class  = "list-group-item list-group-item-$color $class leftMenu-list-item";
-        $data = (count($data) > 0) ? implode(" ", array_map(function($key, $value) {
-            return "data-$key='$value'";
-        }, array_keys($data), $data)) : null;
+        $class  = "list-group-item list-group-item-$color $class leftMenu-list-item text-white text-decoration-none";
+        $attrs = (count($attrs) > 0) ? implode(" ", array_map(function($key, $value) {
+            return "$key='$value'";
+        }, array_keys($attrs), $attrs)) : null;
 
-    return "<a href='$href' class='$class' $data>".icon($icon)." $text</a>";
+    return "<a href='$href' class='$class' $attrs>".icon($icon)." $label</a>";
 }
 ?>

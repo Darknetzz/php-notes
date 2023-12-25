@@ -316,6 +316,10 @@
         /* ───────────────────────────────────────────────────────────────────── */
         /*                               TOGGLE BTN                              */
         /* ───────────────────────────────────────────────────────────────────── */
+        // This is supposed to toggle the visibility of the target, as opposed
+        // to navBtn, which is supposed to hide everything, and then show the
+        // desired page.
+        /* ───────────────────────────────────────────────────────────────────── */
         $(".toggleBtn").on("click", function(e) {
 
             e.preventDefault();
@@ -326,15 +330,22 @@
             var icon        = $(this).find("i").html();
             var text        = $(this).text();
             
-            console.log("Toggling "+text);
+            console.log("Toggling "+target);
+
+            var toggle_on   = icon+" "+text+" <?= icon('eye-slash') ?>";
+            var toggle_off  = icon+" "+text+" <?= icon('eye') ?>";
+            var on_class    = "text-success";
+            var off_class   = "text-secondary";
 
             if (is_visible) {
-                $(this).html("<?= icon('eye-slash') ?> "+text);
+                $(this).html(toggle_off);
+                $(this).addClass(off_class).removeClass(on_class);
                 target_obj.hide();
                 return;
             }
 
-            $(this).html("<?= icon('eye') ?> "+text);
+            $(this).html(toggle_on);
+            $(this).addClass(on_class).removeClass(off_class);
             target_obj.show();
             
         });
@@ -342,20 +353,35 @@
         /* ───────────────────────────────────────────────────────────────────── */
         /*                                NAV BTN                                */
         /* ───────────────────────────────────────────────────────────────────── */
+        // This is supposed to hide everything, and then show the desired page,
+        // as opposed to toggleBtn, which toggles the visibility of the target.
+        /* ───────────────────────────────────────────────────────────────────── */
         $(".navBtn").on("click", function(e) {
             e.preventDefault();
-            
-            
-            $(".navBtn").removeClass("active");
-            $(this).addClass("active");
 
-            $(".displayContent").hide();
+            var icon        = $(this).find("i").html();
+            var text        = $(this).text();
+
+            var toggle_on   = icon+" "+text+" <?= icon('eye-slash') ?>";
+            var toggle_off  = icon+" "+text+" <?= icon('eye') ?>";
+            var on_class    = "text-success";
+            var off_class   = "text-secondary";
             
-            var target = $(this).data("target");
+            $(".navBtn").removeClass(on_class);
+            $(this).addClass(on_class).removeClass(off_class);
+
+            $(".page").hide();
+            var target      = $(this).data("target");
+            var target_obj  = $(target);
             console.log("Navigating to "+target);
-            
-            $(target).show();
+            $(target_obj).show();
         });
+
+        // Hide all .displayContent initially
+        $(".page").hide();
+
+        // Except home
+        $("#home").show();
 
         });
 
