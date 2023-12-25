@@ -119,7 +119,7 @@ function navItem(
         string $href  = Null
     ) {
 
-        $href   = (isset($attrs["data-target"]) ? "#".$attrs["data-target"] : "javascript:void(0);");
+        $href   = (isset($attrs["data-target"]) ? $attrs["data-target"] : "javascript:void(0);");
         
         $color  = (!empty($color)) ? $color : "dark";
         $class  = "list-group-item list-group-item-$color $class leftMenu-list-item text-decoration-none";

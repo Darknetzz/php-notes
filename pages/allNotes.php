@@ -1,4 +1,4 @@
-<div class="page" id="allNotes">
+<div class="page" id="notes">
 
 <?php
 $notes = getNotes("notes.json");

@@ -17,7 +17,7 @@
                 icon: "book-fill", 
                 color: "light", 
                 class: "navBtn home",
-                attrs: ["data-target" => "#allNotes"]
+                attrs: ["data-target" => "#notes"]
             )
             .
             navItem(
@@ -56,8 +56,8 @@
                 navItem(
                 label: "All notes", 
                 icon: "list-ul", 
-                class: "navBtn showAllNotes", 
-                attrs: ["data-target" => "#allNotes"]
+                class: "navBtn", 
+                attrs: ["data-target" => "#notes"]
                 ).
                 navItem(
                 label: "My notes", 

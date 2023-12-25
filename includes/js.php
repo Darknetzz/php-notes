@@ -4,12 +4,14 @@
         /* ───────────────────────────────────────────────────────────────────── */
         /*                              Definitions                              */
         /* ───────────────────────────────────────────────────────────────────── */
-        var addNoteDiv  = $("#addNoteDiv");
-        var addNoteCard = $("#addNoteCard");
-        var addNoteForm = $("#addNoteForm");
-        var allNotes    = $("#allNotes");
-        var responseDiv = $("#response");
-        var breadcrumbs = $(".breadcrumb");
+        var addNoteDiv          = $("#addNoteDiv");
+        var addNoteCard         = $("#addNoteCard");
+        var addNoteForm         = $("#addNoteForm");
+        var notes               = $("#notes");
+        var responseDiv         = $("#response");
+        var breadcrumbs         = $(".breadcrumb");
+        var h                   = window.location.hash;
+        var justLoaded          = false;
 
         /* ───────────────────────────────────────────────────────────────────── */
         /*                          Submit on CTRL+ENTER                         */
@@ -358,14 +360,48 @@
         // This is supposed to hide everything, and then show the desired page,
         // as opposed to toggleBtn, which toggles the visibility of the target.
         /* ───────────────────────────────────────────────────────────────────── */
-
-        $(".navBtn").on("click", function(e) {
+        $(".navBtn, a").on("click", function(e) {
             e.preventDefault();
-            navigate($(this).data("target"));
+
+            var href = $(this).attr("href");
+            
+            if (href[0] == "#") {
+
+                if (h == href) {
+                    console.log("Already on "+href);
+                    return;
+                }
+                
+                console.log("Navigating to "+href);
+                navigate(href);
+            }
         });
 
         /* ────────────────────────────── navigate ───────────────────────────── */
         function navigate(target, button = null) {
+
+            justLoaded = false;
+
+            if (h == target) {
+                console.log("Already on "+target);
+                responseDiv.html("Already on "+target);
+                return;
+            }
+
+            if (target == undefined) {
+                console.log("Target is undefined");
+                responseDiv.html("Target is undefined");
+                $("#404").show();
+                return;
+            }
+
+            // Count breadcrumbs
+            var breadcrumb_count = breadcrumbs.find("li").length;
+            if (breadcrumb_count > 10) {
+                breadcrumbs.show();
+                // Remove first breadcrumb
+                breadcrumbs.find("li:first-child").remove();
+            }
 
             // Add current page to breadcrumb
             var current_page = $(".page:visible").attr("id");
@@ -390,7 +426,7 @@
             var target_obj  = $(target);
 
             // Update url with hashtag
-            window.location.hash = target;
+            h = target.substring(1);
 
             console.log("Navigating to "+target);
 
@@ -408,27 +444,27 @@
 
 
         /* ───────────────────────────────────────────────────────────────────── */
-
-        // Check if a clicked link is a hash
-        $("a").on("click", function(e) {
-            var href = $(this).attr("href");
-            if (href[0] == "#") {
-                e.preventDefault();
-                console.log("Navigating to "+href);
-                navigate(href);
+        do {
+            if (justLoaded == false) {
+                console.log("We have not just loaded, no need to check hash");
+                break;
             }
-        });
 
+            console.log("Just loaded, will check hash");
 
-        if (window.hash) {
-            console.log("Navigating to "+window.hash);
-            $(".navBtn[data-target='"+window.hash+"']").click();
-        } else {
-            // Except home
-            $("#home").show();
-        }
+            if (h && h.length > 0) {
+                console.log("Navigating to " + h);
+                navigate(h);
+            } else {
+                // Except home
+                console.log("Going home because there is no window.hash");
+                navigate("#home");
+            }
 
+            break;
+            console.log("Page loaded with h = " + h);
 
-        });
+        } while (false);
 
+});
 </script>
