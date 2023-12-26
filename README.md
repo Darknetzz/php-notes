@@ -6,14 +6,14 @@ I am implementing authentication and sharing of notes between users.
 
 ---
 
-You can:
+### You can:
  - [X] Write notes
  - [X] Edit notes
  - [X] Delete notes 
 
 ---
 
-Additional features:
+### Additional features
  - [X] Markdown support
  - [ ] More things coming...
  
