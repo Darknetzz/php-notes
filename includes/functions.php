@@ -18,13 +18,18 @@ function alert(string $text, string $type = "success", bool $showicon = True) {
         else if ($type == "info") $icon = icon("info-circle");
         else if ($type == "success") $icon = icon("check-circle");
     }
-    return "<div class='alert alert-$type'>$icon $text</div>";
+    return "
+        <div class='container'>
+            <div class='alert alert-$type'>
+                $icon $text
+            </div>
+        </div>";
 }
 
 /* ───────────────────────────────────────────────────────────────────── */
 /*                                getNotes                               */
 /* ───────────────────────────────────────────────────────────────────── */
-function getNotes(string $notesFile = "notes.json") {
+function getNotes(string $notesFile = NOTES_FILE) {
     $notes = [];
 
     if (!is_file($notesFile) || filesize($notesFile) == 0) {
@@ -41,6 +46,29 @@ function getNotes(string $notesFile = "notes.json") {
 
     $notes = json_decode($notes_json, True);
     return $notes;
+}
+
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                getUsers                               */
+/* ───────────────────────────────────────────────────────────────────── */
+function getUsers(string $usersFile = USERS_FILE) {
+    $users = [];
+
+    if (!is_file($usersFile) || filesize($usersFile) == 0) {
+        file_put_contents($usersFile, "[]");
+        echo alert("Users file '$usersFile' not found. A new one has been created.", "warning");
+    }
+
+    $users_json = file_get_contents($usersFile);
+
+    if (!json_validate($users_json)) {
+        echo alert("Error: <b>$usersFile</b> is not a valid JSON file.", "danger");
+        die();
+    }
+
+    $users = json_decode($users_json, True);
+    return $users;
 }
 
 /* ───────────────────────────────────────────────────────────────────── */
@@ -116,17 +144,30 @@ function navItem(
         string $color = "light",
         string $class = Null,
         array  $attrs  = [],
-        string $href  = Null
-    ) {
+        string $href  = "javascript:void(0);"
+    ) 
+{
 
-        $href   = (isset($attrs["data-target"]) ? $attrs["data-target"] : "javascript:void(0);");
-        
-        $color  = (!empty($color)) ? $color : "dark";
-        $class  = "list-group-item list-group-item-$color $class leftMenu-list-item text-decoration-none";
-        $attrs = (count($attrs) > 0) ? implode(" ", array_map(function($key, $value) {
-            return "$key='$value'";
-        }, array_keys($attrs), $attrs)) : null;
+    $href   = (!empty($attrs["data-target"]) ? $attrs["data-target"] : $href);
+    
+    $color  = (!empty($color)) ? $color : "dark";
+    $class  = " $class text-decoration-none";
+    $attrs = (count($attrs) > 0) ? implode(" ", array_map(function($key, $value) {
+        return "$key='$value'";
+    }, array_keys($attrs), $attrs)) : null;
 
-    return "<a href='$href' class='$class' $attrs>".icon($icon)." $label</a>";
+    $li_class = "
+        navigator-link
+        leftMenu-list-item
+        list-group-item
+        list-group-item-$color
+        text-decoration-none
+    ";
+    $a_class  = "text-$color $class";
+    # list-group-item-$color
+    return "
+    <li class='$li_class'>
+        <a href='$href' class='$a_class' $attrs>".icon($icon)." $label</a>
+    </li>";
 }
 ?>

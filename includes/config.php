@@ -1,13 +1,32 @@
 <?php
 
-$notesFile      = "notes.json";
-$notes          = getNotes($notesFile);
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 Notes                                 */
+/* ───────────────────────────────────────────────────────────────────── */
+define("NOTES_FILE", "notes.json");
+$notes          = getNotes(NOTES_FILE);
 $edit           = "";
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                Markdown                               */
+/* ───────────────────────────────────────────────────────────────────── */
 $md_preview     = "<div class='md-preview'><span class='text-muted'>When you start typing, you can see the preview here.</span></div>";
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 GitHub                                */
+/* ───────────────────────────────────────────────────────────────────── */
 $github_url     = "https://github.com/Darknetzz";
 $project_url    = "$github_url/php-notes";
 
-# Classes
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                 Users                                 */
+/* ───────────────────────────────────────────────────────────────────── */
+define("USERS_FILE", "users.json");
+define("USERS", getUsers(USERS_FILE));
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                                Classes                                */
+/* ───────────────────────────────────────────────────────────────────── */
 $addCardClass       = "border-success";
 $addCardTitleClass  = "bg-success bg-opacity-50 text-white";
 $editCardClass      = "border-warning";

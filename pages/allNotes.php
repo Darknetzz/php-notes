@@ -1,7 +1,7 @@
 <div class="page" id="notes">
 
 <?php
-$notes = getNotes("notes.json");
+$notes = getNotes(NOTES_FILE);
 if (!empty($notes)) {
     foreach ($notes as $key => $value) {
         $text               = $value["content"];

@@ -1,23 +1,7 @@
 <?php
 
 require_once("functions.php");
-$notesFile = "notes.json";
-$notes     = getNotes($notesFile);
-$notes     = (is_array($notes) && !empty($notes) ? $notes : []);
-
-// if (!is_array($notes)) {
-//     $notes      = [];
-//     $notes_json = json_encode($notes);
-//     file_put_contents($notesFile, $notes_json);
-//     echo alert("Notes file was not a valid array - it has been reconstructed.", "success");
-// }
-// if (!is_array($notes)) {
-//     $notes = [];
-// }
-
-// if (empty($notes)) {
-
-// }
+require_once("config.php");
 
 /* ───────────────────────────────────────────────────────────────────── */
 /*                                  ADD                                  */
@@ -45,7 +29,7 @@ if (isset($_POST['add']) && !empty($_POST['text']) && !empty($_POST['id'])) {
 
     array_push($notes, $insert);
     $notes_json = json_encode($notes);
-    file_put_contents($notesFile, $notes_json);
+    file_put_contents(NOTES_FILE, $notes_json);
     echo alert("Note added successfully. ($uniqid)", "success");
 }
 
@@ -68,7 +52,7 @@ if (isset($_POST['del'])) {
 
     unset($notes[$id]);
     $notes_json = json_encode($notes);
-    file_put_contents($notesFile, $notes_json);
+    file_put_contents(NOTES_FILE, $notes_json);
     echo alert("Note deleted successfully.", "success");
     unset($_POST);
 }
@@ -92,7 +76,7 @@ if (isset($_POST['delall']) && !empty($notes)) {
 /* ───────────────────────────────────────────────────────────────────── */
 if (isset($_POST['delallconfirm']) && !empty($notes)) {
     $notes_json = json_encode([]);
-    file_put_contents($notesFile, $notes_json);
+    file_put_contents(NOTES_FILE, $notes_json);
     echo alert("All notes deleted successfully.", "success");
 }
 
@@ -113,7 +97,7 @@ if (isset($_POST['update']) && !empty($_POST['text'])) {
     $notes[$_POST['id']]["content"]             = $safe_text;
     $notes[$_POST['id']]["last_modified_at"]    = date('Y-m-d H:i:s');
     $notes_json = json_encode($notes);
-    file_put_contents($notesFile, $notes_json);
+    file_put_contents(NOTES_FILE, $notes_json);
     echo alert("Note updated successfully.", "success");
     $edit = "";
     unset($_GET);

@@ -1,5 +1,20 @@
 <!-- NOTE: LEFT MENU -->
 <div class="leftMenu d-flex flex-column justify-content-between">
+    <?php
+    if (!isset($_SESSION['user_id'])) {
+        echo "<div>
+                <h4 class='leftMenu-title'>Account</h4>
+                <ul class='leftMenu-list list-group'>
+                    ".navItem(
+                        label: "Login", 
+                        icon: "box-arrow-in-right", 
+                        color: "success", 
+                        class: "login"
+                    )."
+                </ul>
+            </div>";
+    } else {
+    ?>
     <div>
         <h4 class="leftMenu-title">Navigation</h4>
         <ul class="list-group">
@@ -18,14 +33,6 @@
                 color: "light", 
                 class: "navBtn home",
                 attrs: ["data-target" => "#notes"]
-            )
-            .
-            navItem(
-                label: "Add note", 
-                icon: "plus-circle", 
-                color: "light", 
-                class: "navBtn", 
-                attrs: ["data-target" => "#addNoteCard"]
             )
             .
             navItem(
@@ -48,7 +55,7 @@
     </div>
 
     
-    <!-- <div>
+    <div>
         <h4 class="leftMenu-title">Show/Hide</h4>
         <ul class="leftMenu-list list-group">
             <?php
@@ -64,10 +71,18 @@
                 icon: "person-fill", 
                 class: "navBtn myNotes", 
                 attrs: ["data-target" => "#myNotes"]
+                )
+                .
+                navItem(
+                    label: "Add note", 
+                    icon: "plus-circle", 
+                    color: "light", 
+                    class: "navBtn", 
+                    attrs: ["data-target" => "#addNoteCard"]
                 );
             ?>
         </ul>
-    </div> -->
+    </div>
 
 
     <div>
@@ -114,6 +129,8 @@
             ?>
         </ul>
     </div>
+
+    <?php } ?>
 </div>
 
 <!-- <?= navItem(label: "Shared by me", icon: "people-fill", class: "navBtn sharedByMe") ?> -->

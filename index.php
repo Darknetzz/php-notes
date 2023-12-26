@@ -1,3 +1,5 @@
+<?php session_start(); ?>
+
 <!DOCTYPE html>
 <!-- Import latest bootstrap and jquery -->
 <html>
@@ -19,14 +21,20 @@ require_once("includes/config.php");
 
 <body data-bs-theme="dark">
 
-<?php include_once("includes/nav.php"); ?>
+<?php 
+include_once("includes/nav.php"); 
+?>
 
 <!-- NOTE: CONTAINER -->
 <div class="container" style="margin-top:15px">
 
 <div id="response"></div>
-
-<?php require_once("includes/breadcrumbs.php"); ?>
+<?php
+if (!isset($_SESSION['id'])) {
+    require_once("pages/login.php");
+    exit();
+}
+require_once("includes/breadcrumbs.php"); ?>
 
 <div class="pages">
 <?php

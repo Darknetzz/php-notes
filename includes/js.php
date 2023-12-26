@@ -360,7 +360,7 @@
         // This is supposed to hide everything, and then show the desired page,
         // as opposed to toggleBtn, which toggles the visibility of the target.
         /* ───────────────────────────────────────────────────────────────────── */
-        $(".navBtn, a").on("click", function(e) {
+        $(".navigator-link").on("click", function(e) {
             e.preventDefault();
 
             var href = $(this).attr("href");
