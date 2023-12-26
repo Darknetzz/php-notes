@@ -4,10 +4,14 @@
 Well, of course I had to overengineer this thing to infinity, like always.
 I am implementing authentication and sharing of notes between users.
 
+---
+
 You can:
  - [X] Write notes
  - [X] Edit notes
  - [X] Delete notes 
+
+---
 
 Additional features:
  - [X] Markdown support
