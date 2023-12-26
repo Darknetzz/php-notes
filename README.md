@@ -1,5 +1,8 @@
 # php-notes
- A super simple note page.
+ ~~A super simple note page.~~
+
+Well, of course I had to overengineer this thing to infinity, like always.
+I am implementing authentication and sharing of notes between users.
 
 You can:
  - [X] Write notes
