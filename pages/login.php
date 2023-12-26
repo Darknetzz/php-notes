@@ -1,6 +1,11 @@
 
 <?php
 
+if (empty(USERS)) {
+    echo alert("No users found. Please create one in ".USERS_FILE, "danger");
+    exit;
+}
+
 $loginForm = '
 <div class="card">
     <h2 class="card-header">Login</h2>
@@ -35,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    foreach (USERS as $user) {
+    foreach (USERS as $index => $user) {
 
         # If the username doesn't match, skip to the next user
         if ($user['username'] !== $username) {
@@ -52,7 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Successful login
         echo alert("Welcome back, $username!", "success");
-        $_SESSION['id'] = $user['id'];
+        
+        $_SESSION['id'] = $index;
+        header("Location: index.php"); // Redirect to index.php
+        exit;
     }
 }
 

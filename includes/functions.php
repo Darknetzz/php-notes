@@ -34,7 +34,7 @@ function getNotes(string $notesFile = NOTES_FILE) {
 
     if (!is_file($notesFile) || filesize($notesFile) == 0) {
         file_put_contents($notesFile, "[]");
-        echo alert("Notes file '$notesFile' not found. A new one has been created.", "warning");
+        echo alert("Notes file '$notesFile' not found. A new one has been created for you.", "warning");
     }
 
     $notes_json = file_get_contents($notesFile);
@@ -56,8 +56,8 @@ function getUsers(string $usersFile = USERS_FILE) {
     $users = [];
 
     if (!is_file($usersFile) || filesize($usersFile) == 0) {
-        file_put_contents($usersFile, "[]");
-        echo alert("Users file '$usersFile' not found. A new one has been created.", "warning");
+        file_put_contents($usersFile, json_encode(["users" => []]));
+        echo alert("Users file '$usersFile' not found. A new one has been created for you.", "warning");
     }
 
     $users_json = file_get_contents($usersFile);
@@ -68,7 +68,7 @@ function getUsers(string $usersFile = USERS_FILE) {
     }
 
     $users = json_decode($users_json, True);
-    return $users;
+    return $users['users'];
 }
 
 /* ───────────────────────────────────────────────────────────────────── */
