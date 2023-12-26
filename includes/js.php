@@ -363,7 +363,7 @@
         $(".navigator-link").on("click", function(e) {
             e.preventDefault();
 
-            var href = $(this).attr("href");
+            var href = $(this).find("a").attr("href");
             
             if (href[0] == "#") {
 

@@ -6,10 +6,10 @@ if (!empty($notes)) {
     foreach ($notes as $key => $value) {
         $text               = $value["content"];
 
-        $created_datetime   = $value["created_at"];
+        $created_datetime   = (!empty($value["created_at"]) ? $value["created_at"] : Null);
         $created            = "<br><span class='text-muted'>Created ".convertToRelativeTime($created_datetime)."</span>";
 
-        $modified_datetime  = $value["last_modified_at"];
+        $modified_datetime  = (!empty($value["last_modified_at"]) ? $value["last_modified_at"] : Null);
         $modified           = ($modified_datetime != $created_datetime) ? "<br><span class='text-muted'>Updated ".convertToRelativeTime($modified_datetime)."</span>" : Null;
 
         $title              = (!empty($value["title"])) ? $value["title"] : $value["id"];
