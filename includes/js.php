@@ -12,6 +12,7 @@
         var breadcrumbs         = $(".breadcrumb");
         var h                   = window.location.hash;
         var justLoaded          = false;
+        var lastClickedNavBtn   = null;
 
         /* ───────────────────────────────────────────────────────────────────── */
         /*                          Submit on CTRL+ENTER                         */
@@ -372,12 +373,36 @@
                     return;
                 }
                 
-                console.log("Navigating to "+href);
                 navigate(href);
             }
         });
 
-        /* ────────────────────────────── navigate ───────────────────────────── */
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                           update breadcrumbs                          */
+        /* ───────────────────────────────────────────────────────────────────── */
+        function updateBreadcrumb() {
+            var breadcrumb_count = breadcrumbs.find("li").length;
+
+            if (breadcrumb_count > 10) {
+                // Remove first breadcrumb
+                breadcrumbs.find("li:first-child").remove();
+            }
+
+            var current_page = $(".page:visible").attr("id");
+
+            // Find breadcrumbs with current page as text and remove them
+            breadcrumbs.find("li").each(function() {
+                if ($(this).text() == current_page) {
+                    $(this).remove();
+                }
+            });
+
+            breadcrumbs.append("<li class='breadcrumb-item'><a href='#"+current_page+"'>"+current_page+"</li>");
+        }
+
+         /* ───────────────────────────────────────────────────────────────────── */
+         /*                                navigate                               */
+         /* ───────────────────────────────────────────────────────────────────── */
         function navigate(target, button = null) {
 
             justLoaded = false;
@@ -395,19 +420,8 @@
                 return;
             }
 
-            // Count breadcrumbs
-            var breadcrumb_count = breadcrumbs.find("li").length;
-            if (breadcrumb_count > 10) {
-                breadcrumbs.show();
-                // Remove first breadcrumb
-                breadcrumbs.find("li:first-child").remove();
-            }
-
-            // Add current page to breadcrumb
-            var current_page = $(".page:visible").attr("id");
-            breadcrumbs.append("<li class='breadcrumb-item'><a href='#"+current_page+"'>"+current_page+"</li>");
-
             $(".page").hide();
+            $(".page").removeClass("current");
             $(".navBtn").removeClass(on_class);
 
             if (button != null) {
@@ -424,11 +438,10 @@
             }
             
             var target_obj  = $(target);
+            target_obj.addClass("current");
 
             // Update url with hashtag
-            h = target.substring(1);
-
-            console.log("Navigating to "+target);
+            window.location.hash = h = target.substring(1);
 
             // check if target object exists
             if (target_obj.length == 0) {
@@ -439,32 +452,13 @@
             }
 
             target_obj.show();
+            updateBreadcrumb();
         }
 
 
 
         /* ───────────────────────────────────────────────────────────────────── */
-        do {
-            if (justLoaded == false) {
-                console.log("We have not just loaded, no need to check hash");
-                break;
-            }
-
-            console.log("Just loaded, will check hash");
-
-            if (h && h.length > 0) {
-                console.log("Navigating to " + h);
-                navigate(h);
-            } else {
-                // Except home
-                console.log("Going home because there is no window.hash");
-                navigate("#home");
-            }
-
-            break;
-            console.log("Page loaded with h = " + h);
-
-        } while (false);
+        navigate("#home");
 
 });
 </script>

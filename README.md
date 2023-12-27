@@ -16,6 +16,9 @@ I am implementing authentication and sharing of notes between users.
 ### Additional features
  - [X] Markdown support
  - [ ] More things coming...
+
+ ### Todo
+ - [ ] Auth
  
 ![image](https://github.com/Darknetzz/php-notes/assets/42413477/162e649d-84e9-4054-b660-184ad7474d3d)
 

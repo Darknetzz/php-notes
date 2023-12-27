@@ -1,7 +1,7 @@
 <!-- NOTE: LEFT MENU -->
-<div class="leftMenu d-flex flex-column justify-content-between">
+<div class="leftMenu d-flex flex-column justify-content-top">
     <?php
-    if (!isset($_SESSION['user_id'])) {
+    if (!isset($_SESSION['id'])) {
         echo "<div>
                 <h4 class='leftMenu-title'>Account</h4>
                 <ul class='leftMenu-list list-group'>
@@ -15,7 +15,7 @@
             </div>";
     } else {
     ?>
-    <div>
+    <div class="mb-3">
         <h4 class="leftMenu-title">Navigation</h4>
         <ul class="list-group">
             <?php
@@ -55,7 +55,7 @@
     </div>
 
     
-    <div>
+    <div class="mb-3">
         <h4 class="leftMenu-title">Show/Hide</h4>
         <ul class="leftMenu-list list-group">
             <?php
@@ -85,7 +85,7 @@
     </div>
 
 
-    <div>
+    <div class="mb-3">
         <h4 class="leftMenu-title">Account</h4>
         <ul class="leftMenu-list list-group">
             <?php
@@ -107,7 +107,7 @@
         </ul>
     </div>
 
-    <div>
+    <div class="mb-3">
         <h4 class="leftMenu-title text-danger">Danger Zone</h4>
         <ul class="leftMenu-list list-group">
             <?php

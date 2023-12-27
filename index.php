@@ -34,7 +34,16 @@ if (!isset($_SESSION['id'])) {
     require_once("pages/login.php");
     exit();
 }
-require_once("includes/breadcrumbs.php"); ?>
+?>
+
+<!-- breadcrumb -->
+<div>
+<nav aria-label="breadcrumb">
+  <ol id="breadcrumbs" class="breadcrumb">
+
+  </ol>
+</nav>
+</div>
 
 <div class="pages">
 <?php
