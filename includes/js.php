@@ -325,35 +325,35 @@
         // to navBtn, which is supposed to hide everything, and then show the
         // desired page.
         /* ───────────────────────────────────────────────────────────────────── */
-        $(".toggleBtn").on("click", function(e) {
+        // $(".toggleBtn").on("click", function(e) {
 
-            e.preventDefault();
+        //     e.preventDefault();
 
-            var target      = $(this).data("target");
-            var target_obj  = $(target);
-            var is_visible  = target_obj.is(":visible");
-            var icon        = $(this).find("i").html();
-            var text        = $(this).text();
+        //     var target      = $(this).data("target");
+        //     var target_obj  = $(target);
+        //     var is_visible  = target_obj.is(":visible");
+        //     var icon        = $(this).find("i").html();
+        //     var text        = $(this).text();
             
-            console.log("Toggling "+target);
+        //     console.log("Toggling "+target);
 
-            var toggle_on   = icon+" "+text+" <?= icon('eye-slash') ?>";
-            var toggle_off  = icon+" "+text+" <?= icon('eye') ?>";
-            var on_class    = "text-success";
-            var off_class   = "text-secondary";
+        //     var toggle_on   = icon+" "+text+" <?= icon('eye-slash') ?>";
+        //     var toggle_off  = icon+" "+text+" <?= icon('eye') ?>";
+        //     var on_class    = "text-success";
+        //     var off_class   = "text-secondary";
 
-            if (is_visible) {
-                $(this).html(toggle_off);
-                $(this).addClass(off_class).removeClass(on_class);
-                target_obj.hide();
-                return;
-            }
+        //     if (is_visible) {
+        //         $(this).html(toggle_off);
+        //         $(this).addClass(off_class).removeClass(on_class);
+        //         target_obj.hide();
+        //         return;
+        //     }
 
-            $(this).html(toggle_on);
-            $(this).addClass(on_class).removeClass(off_class);
-            target_obj.show();
+        //     $(this).html(toggle_on);
+        //     $(this).addClass(on_class).removeClass(off_class);
+        //     target_obj.show();
             
-        });
+        // });
 
         /* ───────────────────────────────────────────────────────────────────── */
         /*                                NAV BTN                                */
@@ -380,6 +380,9 @@
         /* ───────────────────────────────────────────────────────────────────── */
         /*                           update breadcrumbs                          */
         /* ───────────────────────────────────────────────────────────────────── */
+        /**
+         * Updates the breadcrumb navigation based on the current page.
+         */
         function updateBreadcrumb() {
             var breadcrumb_count = breadcrumbs.find("li").length;
 
@@ -403,6 +406,13 @@
          /* ───────────────────────────────────────────────────────────────────── */
          /*                                navigate                               */
          /* ───────────────────────────────────────────────────────────────────── */
+        /**
+         * Function to navigate to a target page and update the UI accordingly.
+         *
+         * @param string $target The target page to navigate to.
+         * @param null|jQuery $button The button element that triggered the navigation (optional).
+         * @return void
+         */
         function navigate(target, button = null) {
 
             justLoaded = false;
