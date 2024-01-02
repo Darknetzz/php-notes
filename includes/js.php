@@ -419,7 +419,7 @@
 
             if (h == target) {
                 console.log("Already on "+target);
-                responseDiv.html("Already on "+target);
+                // responseDiv.html("Already on "+target);
                 return;
             }
 

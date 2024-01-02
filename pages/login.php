@@ -1,4 +1,6 @@
 
+<div class="page" id="login">
+
 <?php
 
 if (empty(USERS)) {
@@ -68,3 +70,4 @@ echo $loginForm;
 ?>
 
 
+</div>
