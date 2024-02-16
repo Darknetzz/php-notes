@@ -21,40 +21,39 @@ require_once("includes/config.php");
 
 <body data-bs-theme="dark">
 
-<?php 
-include_once("includes/nav.php"); 
-?>
+    <?php 
+    include_once("includes/nav.php"); 
+    ?>
 
-<!-- NOTE: CONTAINER -->
-<div class="container" style="margin-top:15px">
+    <!-- NOTE: CONTAINER -->
+    <div class="container" style="margin-top:15px">
 
-<div id="response"></div>
-<?php
-if (!isset($_SESSION['id'])) {
-    require_once("pages/login.php");
-    exit();
-}
-?>
+        <div id="response"></div>
+        <?php
+        if (!isset($_SESSION['id'])) {
+            require_once("pages/login.php");
+            exit();
+        }
+        ?>
 
-<!-- breadcrumb -->
-<div>
-<nav aria-label="breadcrumb">
-  <ol id="breadcrumbs" class="breadcrumb">
+        <div class="pages">
+            <!-- breadcrumb -->
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol id="breadcrumbs" class="breadcrumb">
 
-  </ol>
-</nav>
-</div>
+                    </ol>
+                </nav>
+            </div>
 
-<div class="pages">
-<?php
-foreach (glob("pages/*.php") as $filename) {
-    require_once($filename);
-}
-?>
-</div>
+            <?php
+            foreach (glob("pages/*.php") as $filename) {
+                require_once($filename);
+            }
+            ?>
+        </div>
 
-
-</div>
+    </div>
 </body>
 
 <?php require_once("includes/js.php"); ?>

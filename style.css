@@ -11,8 +11,16 @@
     --main-color-lightest4: #ffc3ff;
 }
 
-.page {
-    display: none;
+.pages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    /* height: 100vh; */
+    background-color: #222;
+    color: white;
+    margin: 10px;
+
 }
 
 .md-preview {

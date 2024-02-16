@@ -9,7 +9,8 @@
                         label: "Login", 
                         icon: "box-arrow-in-right", 
                         color: "success", 
-                        class: "login"
+                        class: "navBtn login",
+                        attrs: ["data-target" => "#login"],
                     )."
                 </ul>
             </div>";

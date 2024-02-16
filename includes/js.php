@@ -365,7 +365,7 @@
             e.preventDefault();
 
             var href = $(this).find("a").attr("href");
-            
+            console.log(".navigator-link clicked, sending to "+href);
             if (href[0] == "#") {
 
                 if (h == href) {
@@ -468,7 +468,17 @@
 
 
         /* ───────────────────────────────────────────────────────────────────── */
-        navigate("#home");
+        $(document).on("click", ".navBtn", function(e) {
+            e.preventDefault();
+
+            var target = $(this).data("target");
+            var button = $(this);
+            console.log(".navBtn clicked, navigating to "+target);
+            navigate(target, button);
+        });
+
+        $(".page").hide();
+        $("#home").show();
 
 });
 </script>
