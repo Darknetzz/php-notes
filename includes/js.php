@@ -80,7 +80,7 @@
                 textarea = $("#newNote")[0];
                 textarea.focus();
             } else {
-                textarea = $(".page[data-key='"+key+"']").find("textarea")[0];
+                textarea = $(".noteCard[data-key='"+key+"']").find("textarea")[0];
             }
 
             console.log("Applying "+type+" to note "+key);
@@ -198,7 +198,7 @@
             e.preventDefault();
             key = $(this).data("key");
 
-            note = $(".page[data-key='"+key+"']");
+            note = $(".noteCard[data-key='"+key+"']");
             edit = $(".editContent[data-key='"+key+"']");
 
             note.show();
@@ -213,7 +213,7 @@
             e.preventDefault();
             key = $(this).val();
             console.log("Deleting note "+key);
-            $(".page[data-key='"+key+"']").remove();
+            $(".noteCard[data-key='"+key+"']").remove();
 
             // Submit form to formhandler.php
             var closestForm = $(this).closest("form");
@@ -280,7 +280,7 @@
                 success: function(data) {
                     console.log(data);
                     $("#response").html(data);
-                    $(".page").remove();
+                    $(".noteCard").remove();
                 }
             });
         });
@@ -465,8 +465,12 @@
             updateBreadcrumb();
         }
 
+        /* ───────────────────────────────────────────────────────────────────── */
+        /*                             INITIAL STATES                            */
+        /* ───────────────────────────────────────────────────────────────────── */
         $(".page").hide();
         $("#home").show();
+        $(".editContent").hide();
 
 });
 </script>
