@@ -58,8 +58,8 @@
         $(".editNote").click(function(e) {
             e.preventDefault();
 
-            key     = $(this).closest(".page").data("key");
-            note    = $(".page[data-key='"+key+"']");
+            key     = $(this).closest(".noteCard").data("key");
+            note    = $(".noteCard[data-key='"+key+"']");
             edit    = $(".editContent[data-key='"+key+"']");
 
             note.hide();

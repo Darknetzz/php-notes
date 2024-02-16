@@ -50,7 +50,7 @@ if (!empty($notes)) {
             /*                            DISPLAY CONTENT                            */
             /* ───────────────────────────────────────────────────────────────────── */
             echo "
-                <div class='card page ".$notesCardClass."' data-key='$key'>
+                <div class='card noteCard ".$notesCardClass."' data-key='$key'>
                 <h4 class='card-header ".$notesCardTitleClass."'>
                     <div class='d-flex justify-content-between align-items-center'>
                         $title
