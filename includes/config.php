@@ -29,8 +29,8 @@ define("USERS", getUsers(USERS_FILE));
 /* ───────────────────────────────────────────────────────────────────── */
 $addCardClass       = "border-success";
 $addCardTitleClass  = "bg-success bg-opacity-50 text-white";
-$editCardClass      = "border-warning";
-$editCardTitleClass = "bg-warning bg-opacity-50 text-white";
+$editCardClass      = "border-primary";
+$editCardTitleClass = "bg-primary bg-opacity-50 text-white";
 $notesCardClass     = "border-info";
 $notesCardTitleClass= "bg-info bg-opacity-50 text-white";
 ?>

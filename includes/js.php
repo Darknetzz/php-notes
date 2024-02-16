@@ -17,7 +17,7 @@
         /* ───────────────────────────────────────────────────────────────────── */
         /*                          Submit on CTRL+ENTER                         */
         /* ───────────────────────────────────────────────────────────────────── */
-        $("textarea").keydown(function(e) {
+        $(".textarea").keydown(function(e) {
             if (e.ctrlKey && e.keyCode == 13) {
                 var closestForm = $(this).closest("form");
                 var submitButton = closestForm.find("button[type='submit']");
@@ -31,7 +31,7 @@
         /* ───────────────────────────────────────────────────────────────────── */
         /*                               MD Preview                              */
         /* ───────────────────────────────────────────────────────────────────── */
-        $("textarea").on("keyup", function(e) {
+        $(".textarea").on("keyup", function(e) {
             text = $(this).val();
             var parsed = marked.parse(text);
             // Replace ASCII smiley with emoji
@@ -464,18 +464,6 @@
             target_obj.show();
             updateBreadcrumb();
         }
-
-
-
-        /* ───────────────────────────────────────────────────────────────────── */
-        $(document).on("click", ".navBtn", function(e) {
-            e.preventDefault();
-
-            var target = $(this).data("target");
-            var button = $(this);
-            console.log(".navBtn clicked, navigating to "+target);
-            navigate(target, button);
-        });
 
         $(".page").hide();
         $("#home").show();
