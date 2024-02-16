@@ -170,4 +170,12 @@ function navItem(
         <a href='$href' class='$a_class' $attrs>".icon($icon)." $label</a>
     </li>";
 }
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                             md (markdown)                             */
+/* ───────────────────────────────────────────────────────────────────── */
+function md(string $text) {
+    require_once("Michelf/Markdown.inc.php");
+    return \Michelf\Markdown::defaultTransform($text);
+}
 ?>

@@ -5,6 +5,7 @@ $notes = getNotes(NOTES_FILE);
 if (!empty($notes)) {
     foreach ($notes as $key => $value) {
         $text               = $value["content"];
+        $md                 = md($text);
 
         $created_datetime   = (!empty($value["created_at"]) ? $value["created_at"] : Null);
         $created            = "<br><span class='text-muted'>Created ".convertToRelativeTime($created_datetime)."</span>";
@@ -62,7 +63,7 @@ if (!empty($notes)) {
                 <div class='card-body'>
                     <form action='' method='POST'>
                         <div class='d-flex justify-content-between align-items-center'>
-                            <span class='note'>$text</span>
+                            <span class='note'>$md</span>
 
                             <div>
                                 $created

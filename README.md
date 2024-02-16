@@ -14,7 +14,7 @@ I am implementing authentication and sharing of notes between users.
 ---
 
 ### Additional features
- - [X] Markdown support
+ - [X] Markdown support (thanks to https://github.com/michelf/php-markdown/tree/2.0.0)
  - [ ] More things coming...
 
  ### Todo
