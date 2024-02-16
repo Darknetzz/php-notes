@@ -4,6 +4,8 @@
 Well, of course I had to overengineer this thing to infinity, like always.
 I am implementing authentication and sharing of notes between users.
 
+If you actually want **simple** notes, you can use the https://github.com/Darknetzz/php-notes-simple.
+
 ---
 
 ### You can
