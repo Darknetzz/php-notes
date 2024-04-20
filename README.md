@@ -1,6 +1,10 @@
 # php-notes
  ~~A super simple note page.~~
 
+> [!CAUTION]
+> This version of php-notes does not work, and probably won't be fixed in a long time.
+> Please use [php-notes-simple](https://github.com/Darknetzz/php-notes/tree/php-notes-simple) instead.
+
 Well, of course I had to overengineer this thing to infinity, like always.
 I am implementing authentication and sharing of notes between users.
 
