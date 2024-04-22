@@ -1,4 +1,3 @@
-
 # Welcome to php-notes-simple
 *Simplicity in a nutshell* 😎
 

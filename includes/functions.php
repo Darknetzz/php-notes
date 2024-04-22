@@ -1,8 +1,15 @@
 <?php
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*                                    icon                                    */
+/* ────────────────────────────────────────────────────────────────────────── */
 function icon(string $icon, float $px = 15) {
     return "<i class='bi bi-$icon' style='font-size:{$px}px'></i>";
 }
 
+/* ────────────────────────────────────────────────────────────────────────── */
+/*                                    alert                                   */
+/* ────────────────────────────────────────────────────────────────────────── */
 function alert(string $text, string $type = "success", bool $showicon = True) {
     $icon = "";
     if ($showicon) {
@@ -11,31 +18,79 @@ function alert(string $text, string $type = "success", bool $showicon = True) {
         else if ($type == "info") $icon = icon("info-circle");
         else if ($type == "success") $icon = icon("check-circle");
     }
-    return "<div class='alert alert-$type'>$icon $text</div>";
+
+    return "<div class='alert alert-$type'><span class='text-$type'>$icon $text</span></div>";
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*                                   talert                                   */
+/* ────────────────────────────────────────────────────────────────────────── */
+function talert(?string $title, string $text, string $type = "primary", bool $showicon = True,  bool $prefixType = True) {
+
+    $icon = "";
+    if ($showicon) {
+        if ($type == "danger") {
+            $typePrefix = "[ERROR]";
+            $icon = icon("x-circle");
+        }
+        else if ($type == "warning") {
+            $typePrefix = "[WARNING]";
+            $icon = icon("exclamation-circle");
+        }
+        else if ($type == "info") {
+            $typePrefix = "[INFO]";
+            $icon = icon("info-circle");
+        }
+        else if ($type == "success") {
+            $typePrefix = "[SUCCESS]";
+            $icon = icon("check-circle");
+        }
+    }
+
+    if (empty($title)) {
+        $title = $typePrefix;
+    } elseif ($prefixType) {
+        $title = $typePrefix." ".$title;
+    } else {
+        $title = $title;
+    }
+    return "
+        <div class='alert alert-$type'>
+            <h3 class='text-$type'>$icon $title</h3>
+            <p>$text</p>
+        </div>
+    ";
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*                               getNoteMetadata                              */
+/* ────────────────────────────────────────────────────────────────────────── */
+function getNoteMetadata($id) {
+    $title_regex = '/^<!--\n((.|\n)*?)\n-->/s';
+    $date_regex  = '/^<!--\n(.|\n)*?date: (.*)\n-->/m';
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /*                                  getNotes                                  */
 /* ────────────────────────────────────────────────────────────────────────── */
 function getNotes() {
-
     # Check if 'notes' directory exists
     if (!is_dir(NOTES_DIR)) {
-        echo alert("<h3>getNotes</h3>Error: 'notes' directory not found. Please create it.", "danger");
+        echo talert("function getNotes()", "'notes' directory not found. Please create it.", "danger");
         die();
     }
     
     # Check if there are any notes
     $markdownFiles = glob("notes/*.md");
     if (empty($markdownFiles)) {
-        echo alert("<h3>getNotes</h3>No notes found.", "info");
+        echo talert("function getNotes()", "No notes found.", "info");
         return [];
     }
 
     # Get notes metadata and sort it
     $notes_json    = file_get_contents(NOTES_META_FILE_PATH);
     if (!json_validate($notes_json)) {
-        echo alert("<h3>getNotes</h3>Error: Invalid JSON in <b>".NOTES_META_FILE_PATH."</b>", "danger");
+        echo talert("function getNotes()", "No notes found.  Invalid JSON in <b>".NOTES_META_FILE_PATH."</b>", "info");
         die();
     }
     $notes_array   = json_decode($notes_json, True);
@@ -49,11 +104,13 @@ function getNotes() {
         $note_date     = $note["date"];
 
         if (empty($note_id) || $note_id == 0) {
-            echo alert("<h3>getNotes</h3>Error: Note ID is empty or 0.", "danger");
+            echo talert("function getNotes()", "Note ID is empty or 0.", "danger");
             continue;
         }
         if (!file_exists(NOTES_DIR."/$note_id.md")) {
-            echo alert("<h3>getNotes</h3>Note not found: $note_id\n", "warning");
+            echo talert("function getNotes()", "Note not found: $note_id, it has been deleted.", "warning");
+            unset($notes_array[$note_id]);
+            file_put_contents(NOTES_META_FILE_PATH, json_encode($notes_array));
             continue;
         }
         $notes_content = file_get_contents(NOTES_DIR."/$note_id.md");
@@ -74,6 +131,17 @@ function getNotes() {
 /*                                  addNote                                   */
 /* ────────────────────────────────────────────────────────────────────────── */
 function addNote($id, $title, $content = "") {
+    if (empty($title)) {
+        $title = "Untitled";
+    }
+    if (empty($id)) {
+        echo talert("function addNote()", "Note ID is empty.", "danger");
+        return False;
+    }
+    if (empty($content)) {
+        echo talert("function addNote()", "Note content is empty.", "danger");
+        return False;
+    }
     $safe_title   = htmlspecialchars($title);
     $safe_content = htmlspecialchars($content);
 
@@ -86,18 +154,18 @@ function addNote($id, $title, $content = "") {
 
     # Put content in `notes/$id.md` file
     if (!file_exists(NOTES_DIR)) {
-        die("[addNote] Error: 'notes' directory not found.");
+        die(alert("function addNote()", "'notes' directory not found."));
     }
     
     if (file_exists($note_content_file)) {
-        echo alert("<h3>addNote</h3> Error: Note <b>$note_content_file</b> already exists.", "danger");
+        echo talert("function addNote()", "Note <b>$note_content_file</b> already exists.", "danger");
         return False;
     }
 
     file_put_contents($note_content_file, $safe_content);
 
     if (!file_exists($note_content_file)) {
-        echo alert("<h3>addNote</h3> Error: Unable to create note file <b>$note_content_file</b>", "danger");
+        echo talert("function addNote()", "Unable to create note file <b>$note_content_file</b>", "danger");
         return False;
     }
 
@@ -115,7 +183,7 @@ function addNote($id, $title, $content = "") {
     );
     $notes_json = json_encode($notes);
     file_put_contents(NOTES_META_FILE_PATH, $notes_json);
-    echo alert("<h3>addNote</h3> Note added successfully.", "success");
+    echo talert(Null, "Note added successfully.", "success");
     return True;
 }
 
@@ -126,7 +194,7 @@ function updateNote($id, $title, $content = "") {
 
     # Update `notes/$id.md` file
     if (!file_exists(NOTES_DIR."/$id.md")) {
-        echo alert("<h3>updateNote</h3> Error: Note not found.", "danger");
+        echo talert("function updateNote()", "Note not found.", "danger");
         return False;
     }
     $safe_content = htmlspecialchars($content);
@@ -142,7 +210,7 @@ function updateNote($id, $title, $content = "") {
     ];
     $notes_json = json_encode($notes);
     file_put_contents(NOTES_META_FILE_PATH, $notes_json);
-    echo alert("<h3>editNote</h3> Note updated successfully.", "success");
+    echo talert(Null, "Note updated successfully.", "success");
     return True;
 }
 
@@ -153,14 +221,14 @@ function updateNote($id, $title, $content = "") {
 function delNote($id) {
     $notes = getNotes();
     if (!file_exists(NOTES_DIR."/$id.md")) {
-        echo alert("<h3>delNote</h3> Error: Note not found.", "danger");
-        return False;
+        // echo talert("function delNote()", "Note not found.", "danger");
+        return True;
     }
     unlink(NOTES_DIR."/$id.md");
     unset($notes[$id]);
     $notes_json = json_encode($notes);
     file_put_contents(NOTES_META_FILE_PATH, $notes_json);
-    echo alert("<h3>delNote</h3> Note deleted successfully.", "success");
+    echo talert(Null, "Note deleted successfully.", "success");
     return True;
 
 }
@@ -171,7 +239,7 @@ function delNote($id) {
 function delAllNotes() {
     file_put_contents(NOTES_META_FILE_PATH, "{}");
     array_map('unlink', glob(NOTES_DIR."/*.md"));
-    echo alert("All notes deleted successfully.", "success");
+    echo talert(Null, "All notes deleted successfully.", "success");
 }
 
 

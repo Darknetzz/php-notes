@@ -1,3 +1,7 @@
+$(document).ready(function() {
+    
+console.log("Document ready.");
+
 // Submit form with Ctrl+Enter
 $("#text").keydown(function(event) {
     if (event.ctrlKey && event.key === 'Enter') {
@@ -21,4 +25,12 @@ $(".md").each(function() {
         text      = $(this).text(),
         html      = converter.makeHtml(text);
     $(this).html(html);
+    console.log("Converted markdown to HTML.");
 });
+
+$(".debugBtn").on('click', function() {
+    console.log("Debug button clicked.");
+    $(".debugInfo").toggle();
+});
+
+}); // End of $.ready

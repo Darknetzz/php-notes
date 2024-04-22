@@ -1,26 +1,47 @@
 <!DOCTYPE html>
 <!-- Import latest bootstrap and jquery -->
-<html>
+<?php
+require_once("includes/config.php");
+?>
+<html data-bs-theme="dark" class="theme-dark">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NOTES</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
-    <link rel="stylesheet" href="includes/notes.css">
+
+    <?php
+    if (!defined("THEME")) {
+        define("THEME", "tabler");
+    }
+    if (THEME == "tabler") {
+        $themecss = '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">';
+        $themejs  = '<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>';
+    } else {
+        $themecss = '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">';
+        $themejs  = '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>';
+    }
+
+    $css = '
+        <link rel="stylesheet" href="includes/notes.css">
+        '.$themecss.'
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">';
+
+    $js  = '
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+        <script src="includes/notes.js"></script>
+        '.$themejs;
+    ?>
+
+    <?= $css ?>
 </head>
 
 <body data-bs-theme="dark">
 
-<div class="container" style="margin-top:5px">
+<div class="container" style="padding-top:25px;height:100%">
 
 <?php
 require_once("includes/functions.php");
-require_once("includes/config.php");
 
-echo alert("<h5>Debug</h5>".json_encode($_REQUEST), "primary");
 
 $notes = getNotes();
 if (!$notes) {
@@ -177,8 +198,8 @@ if (!empty($notes)) {
 
         echo "
         <div class='textbox'>
+            <h4>$title</h4>
             <div class='d-flex justify-content-between'>
-                <h4>$title</h4>
                 <div class='md'>$content</div>
                 ".(!empty($date) ? "<div class='text-muted' title='$date'>".relativeTime($date)."</div>" : "")."
             </div>
@@ -192,6 +213,31 @@ if (!empty($notes)) {
 } else {
     alert("Nothing added yet.", "warning");
 }
+
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*                                    Debug                                   */
+/* ────────────────────────────────────────────────────────────────────────── */
+if (!empty($_REQUEST)) {
+    echo '
+    <button class="btn btn-info debugBtn" type="button">
+        Debug
+    </button>
+    </p>
+
+    <div class="debugInfo hidden">
+        '.alert('
+        <div class="card">
+            <h5 class="card-header">Debug</h5>
+            <div class="card-body">
+                '.json_encode($_REQUEST, JSON_PRETTY_PRINT).'
+            </div>
+        </div>
+        ').
+    "</div>";
+}
+
 ?>
 </div>
 </body>
+<?= $js ?>
