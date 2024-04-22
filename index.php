@@ -2,6 +2,11 @@
 <!-- Import latest bootstrap and jquery -->
 <?php
 require_once("includes/config.php");
+
+# Put content in `notes/$id.md` file
+if (!file_exists(NOTES_DIR)) {
+    die(alert("function addNote()", "'notes' directory not found."));
+}
 ?>
 <html data-bs-theme="dark" class="theme-dark">
 <head>
@@ -61,9 +66,14 @@ $buttons      = "";
 if (!empty($action)) {
 
     # Check that we have an ID
-    if (empty($id)) {
-        echo alert("ID not found.", "danger");
-        die();
+    if ($action != "add" && $action != "delall") {
+        if (empty($id)) {
+            echo alert("ID not found.", "danger");
+            die();
+        }
+        if (empty($title)) {
+            $title = "Untitled";
+        }
     }
 
     /* ────────────────────────────────────────────────────────────────────────── */
@@ -71,7 +81,7 @@ if (!empty($action)) {
     /* ────────────────────────────────────────────────────────────────────────── */
     if ($action == "add") {
         # $id, $title, $content = ""
-        addNote($id, $_POST['title'], $_POST['content']);
+        addNote($_POST['title'], $_POST['content']);
     }
 
     /* ────────────────────────────────────────────────────────────────────────── */
@@ -79,11 +89,7 @@ if (!empty($action)) {
     /* ────────────────────────────────────────────────────────────────────────── */
     if ($action == "update") {
         # $id, $title, $content = ""
-        $updateNote = updateNote($id, $_POST['title'], $_POST['content']);
-        if (!$updateNote) {
-            echo alert("Error adding note.", "danger");
-        }
-        echo alert("Note added successfully.", "success");
+        updateNote($_POST['title'], $_POST['content']);
     }
 
     /* ────────────────────────────────────────────────────────────────────────── */

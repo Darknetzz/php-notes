@@ -57,17 +57,81 @@ function talert(?string $title, string $text, string $type = "primary", bool $sh
     return "
         <div class='alert alert-$type'>
             <h3 class='text-$type'>$icon $title</h3>
+            <hr>
             <p>$text</p>
         </div>
     ";
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
+/*                                   slugify                                  */
+/* ────────────────────────────────────────────────────────────────────────── */
+function slugify(string $text) {
+    $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+    $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+    $text = preg_replace('~[^-\w]+~', '', $text);
+    $text = trim($text, '-');
+    $text = preg_replace('~-+~', '-', $text);
+    $text = strtolower($text);
+    if (empty($text)) {
+        return 'n-a';
+    }
+    return $text;
+}
+
+function createNoteMetadata($id, $title, $date) {
+    return trim("
+    <!-- ID: $id -->\n
+    <!-- Title: $title --\n
+    <!-- Date: ".date("Y-m-d H:i:s")." -->\n
+    <!-- File: ".slugify($title).".md -->\n");
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
 /*                               getNoteMetadata                              */
 /* ────────────────────────────────────────────────────────────────────────── */
-function getNoteMetadata($id) {
-    $title_regex = '/^<!--\n((.|\n)*?)\n-->/s';
-    $date_regex  = '/^<!--\n(.|\n)*?date: (.*)\n-->/m';
+function extractNoteMetadata($content) {
+    // Regular expression to extract the ID
+    $idMatches = '/<!--\s*ID:\s*(.*?)\s*-->/';
+    // Regular expression to extract the title
+    $titlePattern = '/<!--\s*Title:\s*(.*?)\s*-->/';
+    // Regular expression to extract the date
+    $datePattern = '/<!--\s*Date:\s*(.*?)\s*-->/';
+
+    // Attempt to extract the ID
+    $id = "ID not found.";
+    if (preg_match($datePattern, $markdownContent, $idMatches)) {
+        $id = $idMatches[1]; // The first captured group
+    }
+
+    // Attempt to extract the title
+    $title = "Title not found.";
+    if (preg_match($titlePattern, $markdownContent, $titleMatches)) {
+        $title = $titleMatches[1]; // The first captured group
+    }
+
+    // Attempt to extract the date
+    $date = "Date not found.";
+    if (preg_match($datePattern, $markdownContent, $dateMatches)) {
+        $date = $dateMatches[1]; // The first captured group
+    }
+
+
+    return [
+        "id"    => $id,
+        "title" => $title,
+        "file"  => NOTES_DIR."/".slugify($title).".md",
+        "date"  => $date,
+    ];
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*                                stripMetadata                               */
+/* ────────────────────────────────────────────────────────────────────────── */
+function stripMetadata($content) {
+    // Regular expression to match HTML-style comments
+    $commentPattern = '/<!--(.*?)-->/s';
+    return preg_replace($commentPattern, '', $content);
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -79,87 +143,59 @@ function getNotes() {
         echo talert("function getNotes()", "'notes' directory not found. Please create it.", "danger");
         die();
     }
-    
+
     # Check if there are any notes
     $markdownFiles = glob("notes/*.md");
+
+    # Empty
     if (empty($markdownFiles)) {
         echo talert("function getNotes()", "No notes found.", "info");
         return [];
     }
 
-    # Get notes metadata and sort it
-    $notes_json    = file_get_contents(NOTES_META_FILE_PATH);
-    if (!json_validate($notes_json)) {
-        echo talert("function getNotes()", "No notes found.  Invalid JSON in <b>".NOTES_META_FILE_PATH."</b>", "info");
-        die();
-    }
-    $notes_array   = json_decode($notes_json, True);
-    // usort($notes_array, fn($a, $b) => $a['date'] <=> $b['date']);
+    $notes_array = [];
+    foreach ($markdownFiles as $file) {
+        $content  = file_get_contents($file);
+        $metadata = extractNoteMetadata($content);
 
-    # Get notes content
-    foreach ($notes_array as $id => $note) {
-        
-        $note_id       = $note["id"];
-        $note_title    = $note["title"];
-        $note_date     = $note["date"];
-
-        if (empty($note_id) || $note_id == 0) {
-            echo talert("function getNotes()", "Note ID is empty or 0.", "danger");
-            continue;
-        }
-        if (!file_exists(NOTES_DIR."/$note_id.md")) {
-            echo talert("function getNotes()", "Note not found: $note_id, it has been deleted.", "warning");
-            unset($notes_array[$note_id]);
-            file_put_contents(NOTES_META_FILE_PATH, json_encode($notes_array));
-            continue;
-        }
-        $notes_content = file_get_contents(NOTES_DIR."/$note_id.md");
-
-
-        $notes[$note_id] = [
-            "id"      => $note_id,
-            "title"   => $note_title,
-            "date"    => $note_date,
-            "file"    => NOTES_DIR."/$note_id.md",
-            "content" => $notes_content,
+        // Remove the comments from the content displayed
+        $content = trim(stripMetadata($content));
+        $notes_array[] = [
+            "id"      => $id,
+            "title"   => $title,
+            "date"    => $date,
+            "content" => $content,
         ];
     }
-    return $notes;
+
+    return $notes_array;
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /*                                  addNote                                   */
 /* ────────────────────────────────────────────────────────────────────────── */
-function addNote($id, $title, $content = "") {
+function addNote($content = "", $title = Null) {
+    $id = uniqid();
     if (empty($title)) {
         $title = "Untitled";
-    }
-    if (empty($id)) {
-        echo talert("function addNote()", "Note ID is empty.", "danger");
-        return False;
     }
     if (empty($content)) {
         echo talert("function addNote()", "Note content is empty.", "danger");
         return False;
     }
-    $safe_title   = htmlspecialchars($title);
-    $safe_content = htmlspecialchars($content);
 
-    $note_content_file = NOTES_DIR."/$id.md";
+    $metadata     = createNoteMetadata($id, $title, date("Y-m-d H:i:s"));
+    $safe_content = $metadata.htmlspecialchars($content);
+
+    $slug_title        = slugify($title);
+    $note_content_file = NOTES_DIR."/".$slug_title.".md";
     $notes             = getNotes();
-
-    if (empty($notes)) {
-        $notes = [];
-    }
-
-    # Put content in `notes/$id.md` file
-    if (!file_exists(NOTES_DIR)) {
-        die(alert("function addNote()", "'notes' directory not found."));
-    }
     
-    if (file_exists($note_content_file)) {
-        echo talert("function addNote()", "Note <b>$note_content_file</b> already exists.", "danger");
-        return False;
+    $append = 1;
+    while (file_exists($note_content_file) === True) {
+        echo talert("function addNote()", "Note <b>$note_content_file</b> already exists. Appending $append after..", "danger");
+        $note_content_file = NOTES_DIR."/${slug_title}_${append}.md";
+        $append++;
     }
 
     file_put_contents($note_content_file, $safe_content);
@@ -169,20 +205,6 @@ function addNote($id, $title, $content = "") {
         return False;
     }
 
-
-
-    # Insert metadata
-    array_push(
-        $notes, 
-            [
-                "id"    => $id,
-                "title" => $safe_title,
-                "date"  => date("Y-m-d H:i:s"),
-                "file"  => NOTES_DIR."/$id.md",
-            ]
-    );
-    $notes_json = json_encode($notes);
-    file_put_contents(NOTES_META_FILE_PATH, $notes_json);
     echo talert(Null, "Note added successfully.", "success");
     return True;
 }
@@ -190,26 +212,26 @@ function addNote($id, $title, $content = "") {
 /* ────────────────────────────────────────────────────────────────────────── */
 /*                                 updateNote                                 */
 /* ────────────────────────────────────────────────────────────────────────── */
-function updateNote($id, $title, $content = "") {
+function updateNote($title, $content = "") {
 
     # Update `notes/$id.md` file
     if (!file_exists(NOTES_DIR."/$id.md")) {
         echo talert("function updateNote()", "Note not found.", "danger");
         return False;
     }
-    $safe_content = htmlspecialchars($content);
-    file_put_contents(NOTES_DIR."/$id.md", $safe_content);
 
-    # Update metadata
-    $notes = getNotes();
-    $notes[$id] = [
-        "id"    => $id,
-        "title" => $title,
-        "date"  => date("Y-m-d H:i:s"),
-        "file"  => NOTES_DIR."/$id.md",
-    ];
-    $notes_json = json_encode($notes);
-    file_put_contents(NOTES_META_FILE_PATH, $notes_json);
+    $content = stripNoteMetadata($content);
+
+    $safe_content = trim("
+    <!-- ID: $id -->\n
+    <!-- Title: $title -->\n
+    <!-- Date: ".date("Y-m-d H:i:s")." -->\n
+    ".htmlspecialchars($content));
+
+    $file_slug = slugify($title);
+
+    file_put_contents(NOTES_DIR."/$file_slug.md", $safe_content);
+
     echo talert(Null, "Note updated successfully.", "success");
     return True;
 }
@@ -218,28 +240,19 @@ function updateNote($id, $title, $content = "") {
 /* ────────────────────────────────────────────────────────────────────────── */
 /*                                   delNote                                  */
 /* ────────────────────────────────────────────────────────────────────────── */
-function delNote($id) {
-    $notes = getNotes();
-    if (!file_exists(NOTES_DIR."/$id.md")) {
-        // echo talert("function delNote()", "Note not found.", "danger");
-        return True;
-    }
-    unlink(NOTES_DIR."/$id.md");
-    unset($notes[$id]);
-    $notes_json = json_encode($notes);
-    file_put_contents(NOTES_META_FILE_PATH, $notes_json);
+function delNote($file) {
+    unlink(NOTES_DIR."/$file.md");
     echo talert(Null, "Note deleted successfully.", "success");
     return True;
-
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /*                                 delAllNotes                                */
 /* ────────────────────────────────────────────────────────────────────────── */
 function delAllNotes() {
-    file_put_contents(NOTES_META_FILE_PATH, "{}");
     array_map('unlink', glob(NOTES_DIR."/*.md"));
     echo talert(Null, "All notes deleted successfully.", "success");
+    return True;
 }
 
 
