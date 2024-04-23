@@ -177,9 +177,9 @@ function getNotes() {
     foreach ($markdownFiles as $file) {
         $content  = file_get_contents($file);
         $metadata = extractNoteMetadata($content);
+        $content  = stripMetadata($content);
         if (empty($metadata['id']) || empty($metadata['title']) || empty($metadata['date']) || empty($metadata['file'])) {
             echo talert("function getNotes()", "Note metadata not found for $file, attempting to add.", "danger");
-            stripMetadata($content);
             addNote($content, "Untitled");
             continue;
         }
