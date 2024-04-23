@@ -56,8 +56,9 @@ if (!$notes) {
 
 $action       = (!empty($_GET['action']) ? $_GET['action'] : Null);
 $action       = (!empty($_POST['action']) ? $_POST['action'] : $action);
-$id           = (!empty($_POST['id']) ? $_POST['id'] : Null);
-$id           = (!empty($_GET['id']) ? $_GET['id'] : $id);
+$title        = (!empty($_POST['title']) ? $_POST['title'] : "Untitled");
+$id           = (!empty($_GET['id']) ? slugify($_GET['id']) : Null);
+$id           = (!empty($id) ? slugify($id) : Null);
 $titleContent = "";
 $editContent  = "";
 $buttons      = "";
@@ -68,7 +69,7 @@ if (!empty($action)) {
     # Check that we have an ID
     if ($action != "add" && $action != "delall") {
         if (empty($id)) {
-            echo alert("ID not found.", "danger");
+            echo alert("ID is empty", "danger");
             die();
         }
         if (empty($title)) {
@@ -124,9 +125,8 @@ if (!empty($action)) {
     /*                                    edit                                    */
     /* ────────────────────────────────────────────────────────────────────────── */
     if ($action == "edit") {
-        $editId       = $id;
-        $titleContent = $notes[$id]['title'];
-        $editContent  = $notes[$id]['content'];
+        $titleContent = getNote($id)['title'];
+        $editContent  = getNote($id)['content'];
     }
 }
     ?>
@@ -137,18 +137,14 @@ if (!empty($action)) {
 /* ────────────────────────────────────────────────────────────────────────── */
 ?>
 <div class="card">
-    <h3 class="card-header">Notes</h3>
+    <h3 class="card-header"><?= (!empty($id) ? "Editing note $id" : "New note") ?></h3>
     <div class="card-body">
         <form action="index.php" method="POST">
-            <input class="form-control" name="title" id="title" value="<?= $titleContent ?>" placeholder="Title">
-            <textarea class="form-control" name="content" id="text" cols="30" rows="10" placeholder="Content (supports markdown!)"><?= $editContent ?></textarea>
+            <input class="form-control my-2" name="title" id="title" value="<?= $titleContent ?>" placeholder="Title">
+            <textarea class="form-control my-2" name="content" id="text" cols="30" rows="10" placeholder="Content (supports markdown!)"><?= $editContent ?></textarea>
             <br>
             <div class="btn-group">
                 <?php
-                if (empty($id)) {
-                    $id = uniqid("NOTE_");
-                }
-
                 if ($action == "edit") {
                     $action  = "update";
                     $buttons = "

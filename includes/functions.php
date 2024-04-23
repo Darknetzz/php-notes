@@ -79,12 +79,15 @@ function slugify(string $text) {
     return $text;
 }
 
-function createNoteMetadata($id, $title, $date) {
-    return trim("
-    <!-- ID: $id -->\n
-    <!-- Title: $title --\n
-    <!-- Date: ".date("Y-m-d H:i:s")." -->\n
-    <!-- File: ".slugify($title).".md -->\n");
+/* ───────────────────────────────────────────────────────────────────── */
+/*                           createNoteMetadata                          */
+/* ───────────────────────────────────────────────────────────────────── */
+function createNoteMetadata($title) {
+    return trim(str_replace(" ", "", "
+    <!-- ID: ".slugify($title)." -->
+    <!-- Title: $title -->
+    <!-- Date: ".date("Y-m-d H:i:s")." -->
+    <!-- File: ".NOTES_DIR."/".slugify($title).".md -->"));
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -100,25 +103,25 @@ function extractNoteMetadata($content) {
 
     // Attempt to extract the ID
     $id = "ID not found.";
-    if (preg_match($datePattern, $markdownContent, $idMatches)) {
+    if (preg_match($datePattern, $content, $idMatches)) {
         $id = $idMatches[1]; // The first captured group
     }
 
     // Attempt to extract the title
     $title = "Title not found.";
-    if (preg_match($titlePattern, $markdownContent, $titleMatches)) {
+    if (preg_match($titlePattern, $content, $titleMatches)) {
         $title = $titleMatches[1]; // The first captured group
     }
 
     // Attempt to extract the date
     $date = "Date not found.";
-    if (preg_match($datePattern, $markdownContent, $dateMatches)) {
+    if (preg_match($datePattern, $content, $dateMatches)) {
         $date = $dateMatches[1]; // The first captured group
     }
 
 
     return [
-        "id"    => $id,
+        "id"    => slugify($title),
         "title" => $title,
         "file"  => NOTES_DIR."/".slugify($title).".md",
         "date"  => $date,
@@ -131,7 +134,20 @@ function extractNoteMetadata($content) {
 function stripMetadata($content) {
     // Regular expression to match HTML-style comments
     $commentPattern = '/<!--(.*?)-->/s';
-    return preg_replace($commentPattern, '', $content);
+    return preg_replace($commentPattern, Null, $content);
+}
+
+/* ───────────────────────────────────────────────────────────────────── */
+/*                         getNoteContent($note)                         */
+/* ───────────────────────────────────────────────────────────────────── */
+function getNote($id) {
+    if (!file_exists(NOTES_DIR."/$id.md")) {
+        echo talert("function getNoteContent()", "Note not found.", "danger");
+        return False;
+    }
+    $title   = extractNoteMetadata($content)['title'];
+    $content = stripMetaData(trim(file_get_contents(NOTES_DIR."/$id.md")));
+    return ["title" => $title, "content" => $content];
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -157,6 +173,15 @@ function getNotes() {
     foreach ($markdownFiles as $file) {
         $content  = file_get_contents($file);
         $metadata = extractNoteMetadata($content);
+        if (empty($metadata['id']) || empty($metadata['title']) || empty($metadata['date']) || empty($metadata['file'])) {
+            echo talert("function getNotes()", "Note metadata not found for $file, attempting to add.", "danger");
+            stripMetadata($content);
+            addNote($content, "Untitled");
+            continue;
+        }
+        $id       = $metadata['id'];
+        $title    = $metadata['title'];
+        $date     = $metadata['date'];
 
         // Remove the comments from the content displayed
         $content = trim(stripMetadata($content));
@@ -164,6 +189,7 @@ function getNotes() {
             "id"      => $id,
             "title"   => $title,
             "date"    => $date,
+            "file"    => $file,
             "content" => $content,
         ];
     }
@@ -175,7 +201,6 @@ function getNotes() {
 /*                                  addNote                                   */
 /* ────────────────────────────────────────────────────────────────────────── */
 function addNote($content = "", $title = Null) {
-    $id = uniqid();
     if (empty($title)) {
         $title = "Untitled";
     }
@@ -184,24 +209,25 @@ function addNote($content = "", $title = Null) {
         return False;
     }
 
-    $metadata     = createNoteMetadata($id, $title, date("Y-m-d H:i:s"));
+    $metadata     = createNoteMetadata($title);
     $safe_content = $metadata.htmlspecialchars($content);
 
-    $slug_title        = slugify($title);
-    $note_content_file = NOTES_DIR."/".$slug_title.".md";
-    $notes             = getNotes();
+    $notes = getNotes();
+
+    $id   = slugify($title);
+    $file = NOTES_DIR."/".$id.".md";
     
     $append = 1;
-    while (file_exists($note_content_file) === True) {
-        echo talert("function addNote()", "Note <b>$note_content_file</b> already exists. Appending $append after..", "danger");
-        $note_content_file = NOTES_DIR."/${slug_title}_${append}.md";
+    while (file_exists($file) === True) {
+        echo talert("function addNote()", "Note <b>$id</b> already exists. Appending $append after..", "danger");
+        $file = NOTES_DIR."/${id}_${append}.md";
         $append++;
     }
 
-    file_put_contents($note_content_file, $safe_content);
+    file_put_contents($file, $safe_content);
 
-    if (!file_exists($note_content_file)) {
-        echo talert("function addNote()", "Unable to create note file <b>$note_content_file</b>", "danger");
+    if (!file_exists($file)) {
+        echo talert("function addNote()", "Unable to create note file <b>$file</b>", "danger");
         return False;
     }
 
@@ -220,12 +246,13 @@ function updateNote($title, $content = "") {
         return False;
     }
 
-    $content = stripNoteMetadata($content);
+    $content  = stripNoteMetadata($content);
+    $metadata = createNoteMetadata($title);
 
     $safe_content = trim("
     <!-- ID: $id -->\n
     <!-- Title: $title -->\n
-    <!-- Date: ".date("Y-m-d H:i:s")." -->\n
+    <!-- Date: ".$date." -->\n
     ".htmlspecialchars($content));
 
     $file_slug = slugify($title);
@@ -260,8 +287,11 @@ function delAllNotes() {
 /*                                relativeTime                                */
 /* ────────────────────────────────────────────────────────────────────────── */
 function relativeTime(string $date) {
-    $date = new DateTime($date);
+    
     $now = new DateTime();
+    if (empty($date)) return $now;
+
+    $date = new DateTime($date);
     $diff = $now->diff($date);
 
     if ($diff->y > 0) {
