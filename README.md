@@ -1,4 +1,14 @@
-# php-notes-simple
+# php-notes-json
+
+php-notes-json was the first version of php-notes.
+
+All notes are stored in a simple JSON file.
+I would recommend using php-notes-simple instead (using markdown files).
+
+This branch is now read-only.
+
+---
+
 An *actual* super simple note page with markdown support!
 
 Just git clone to your (PHP-supported) webserver and start taking notes. :)
