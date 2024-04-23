@@ -102,28 +102,32 @@ function extractNoteMetadata($content) {
     $datePattern = '/<!--\s*Date:\s*(.*?)\s*-->/';
 
     // Attempt to extract the ID
-    $id = "ID not found.";
-    if (preg_match($datePattern, $content, $idMatches)) {
-        $id = $idMatches[1]; // The first captured group
-    }
+    // $id = "ID not found.";
+    // if (preg_match($datePattern, $content, $idMatches)) {
+    //     $id = $idMatches[1]; // The first captured group
+    // }
 
     // Attempt to extract the title
-    $title = "Title not found.";
+    $id    = Null;
+    $title = Null;
+    $file  = Null;
     if (preg_match($titlePattern, $content, $titleMatches)) {
         $title = $titleMatches[1]; // The first captured group
+        $id    = slugify($title);
+        $file  = NOTES_DIR."/".$id.".md";
     }
 
     // Attempt to extract the date
-    $date = "Date not found.";
+    $date = Null;
     if (preg_match($datePattern, $content, $dateMatches)) {
         $date = $dateMatches[1]; // The first captured group
     }
 
 
     return [
-        "id"    => slugify($title),
+        "id"    => $id,
         "title" => $title,
-        "file"  => NOTES_DIR."/".slugify($title).".md",
+        "file"  => $file,
         "date"  => $date,
     ];
 }
@@ -288,9 +292,9 @@ function delAllNotes() {
 /* ────────────────────────────────────────────────────────────────────────── */
 function relativeTime(string $date) {
     
+    if (empty($date)) return "Unknown";
+    
     $now = new DateTime();
-    if (empty($date)) return $now;
-
     $date = new DateTime($date);
     $diff = $now->diff($date);
 
