@@ -1,6 +1,6 @@
 # php-notes-simple
 
-> **NOTE:** See the [ace](https://github.com/Darknetzz/php-notes/tree/ace) branch for improvements to the editor and php-notes in general.
+> ⚠️ **NOTE:** See the [ace](https://github.com/Darknetzz/php-notes/tree/ace) branch for improvements to the editor and php-notes in general.
 
 An *actual* super simple note page with markdown support!
 
