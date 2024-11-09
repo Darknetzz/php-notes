@@ -15,7 +15,16 @@
             padding: 10px;
             margin-bottom: 10px;
         }
+        .text {
+            min-height: 200px;
+        
+        }
     </style>
+
+
+    <!-- Ace editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.4/ace.min.js"></script>
+    <link href=" https://cdn.jsdelivr.net/npm/ace-builds@1.36.4/css/ace.min.css " rel="stylesheet">
 
 </head>
 
@@ -88,7 +97,10 @@ if (isset($_GET['edit'])) {
     <h3 class="card-header">Notes</h3>
     <div class="card-body">
         <form action="index.php" method="POST">
-            <textarea class="form-control" name="text" id="text" cols="30" rows="10"><?= $edit ?></textarea>
+        <!-- NOTE: textarea -->
+            <textarea class="form-control" name="text" id="text" cols="30" rows="10">
+                <?= $edit ?>
+            </textarea>
             <br>
             <div class="btn-group">
                 <?php
@@ -145,6 +157,17 @@ if (!empty($notes)) {
 </body>
 
 <script>
+
+// Initialize Ace editor
+var editor = ace.edit("text");
+editor.setTheme("ace/theme/monokai");
+editor.session.setMode("ace/mode/markdown");
+editor.setOptions({
+    maxLines: Infinity,
+    wrap: true,
+        copyWithEmptySelection: true,
+});
+
 // Submit form with Ctrl+Enter
 $("#text").keydown(function(event) {
     if (event.ctrlKey && event.key === 'Enter') {

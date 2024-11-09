@@ -1,5 +1,5 @@
 <?php
-function icon(string $icon, float $px = 15) {
+function icon(string $icon, float $size = 15) {
     return "<i class='bi bi-$icon' style='font-size:{$size}px'></i>";
 }
 
