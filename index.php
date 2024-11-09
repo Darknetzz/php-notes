@@ -43,10 +43,10 @@ $edit      = "";
 # NOTE: Form submission
 do {
 
-    $do = (!empty($_REQUEST['do']) ? $_REQUEST['do'] : "add");
-    $text   = (!empty($_REQUEST['text']) ? $_REQUEST['text'] : Null);
-    $id     = (!empty($_REQUEST['id']) ? $_REQUEST['id'] : Null);
-    $debug  = "
+    $do    = (!empty($_REQUEST['do']) ? $_REQUEST['do'] : "add");
+    $text  = (!empty($_REQUEST['md']) ? $_REQUEST['md'] : Null);
+    $id    = (!empty($_REQUEST['id']) ? $_REQUEST['id'] : Null);
+    $debug = "
         <div id='debugInfo' class='card' style='display:none;'>
             <h4 class='card-header bg-secondary-subtle'>Debug Info</h4>
             <div class='card-body'>
@@ -57,7 +57,7 @@ do {
 
     if (!empty($text)) {
         if ($do == "add") {
-            $safe_text = htmlspecialchars($_REQUEST['text']);
+            $safe_text = htmlspecialchars($text);
             array_push($notes, ["note" => $safe_text, "date" => date("Y-m-d H:i:s")]);
             $notes_json = json_encode($notes);
             file_put_contents($notesFile, $notes_json);
@@ -69,8 +69,8 @@ do {
                 echo alert("No ID provided when editing note.");
                 break;
             }
-            $safe_text = htmlspecialchars($_REQUEST['text']);
-            $notes[$_REQUEST['id']] = ["note" => $safe_text, "date" => date("Y-m-d H:i:s")];
+            $safe_text = htmlspecialchars($text);
+            $notes[$id] = ["note" => $safe_text, "date" => date("Y-m-d H:i:s")];
             $notes_json = json_encode($notes);
             file_put_contents($notesFile, $notes_json);
             echo alert("Note updated successfully.", "success");
@@ -105,15 +105,6 @@ do {
         }
     }
 
-    # DEPRECATED: Can be removed in `ace` branch
-    # But we'll keep it anyway for now to be non-js compliant.
-    if (isset($_REQUEST['edit'])) {
-        $edit = $notes[$_REQUEST['edit']];
-        if (is_array($edit)) {
-            $edit = $edit['note'];
-        }
-    }
-
     unset($_REQUEST, $_GET, $_POST, $id, $text, $do);
 
 } while (False);
@@ -135,11 +126,11 @@ do {
             <div id="text"><?= $edit ?></div>
             <br>
             <div id="formAddButtons" class="btn-group formBtnGroup" style="display:none;">
-                <button type='submit' class='btn btn-success'><?= icon('plus-circle') ?> Add</button>
+                <button type='button' id="addNoteBtn" class='btn btn-success'><?= icon('plus-circle') ?> Add</button>
                 <button type='submit' class='btn btn-danger' name='delall'><?= icon('trash') ?> Delete all</button>
             </div>
             <div id="formEditButtons" class="btn-group formBtnGroup" style="display:none;">
-                <button type='submit' id='updateNoteBtn' class='btn btn-success'><?= icon('floppy') ?> Update</button>
+                <button type='button' id='updateNoteBtn' class='btn btn-success'><?= icon('floppy') ?> Update</button>
                 <button type='button' id='cancelNoteBtn' class='btn btn-secondary'><?= icon('x-circle') ?> Cancel</button>
             </div>
         </form>
@@ -242,9 +233,14 @@ if (!empty($notes)) {
         const form           = $(".noteForm");
         const formIdInput    = form.find("input[name='id']").prop("value", null);
         const formDoInput    = form.find("input[name='do']").val("add");
-        const formMdInput    = form.find("input[name='md']").val("");
+        const formMdInput    = form.find("input[name='md']");
         const formEditBtns   = form.find("#formEditButtons");
         const formAddButtons = form.find("#formAddButtons").show();
+
+
+        console.log("formIdInput: " + formIdInput.length);
+        console.log("formDoInput: " + formDoInput.length);
+        console.log("formMdInput: " + formMdInput.length);
 
         $(".editNote").on("click", function(e) {
             e.preventDefault();
@@ -269,16 +265,37 @@ if (!empty($notes)) {
         });
 
         // updateNoteBtn
-        $("updateNoteBtn").on("click", function() {
-            var editorText = editor.getValue();
-            formMdInput.val(editorText);
+        $("#updateNoteBtn").on("click", function(e) {
+            e.preventDefault();
+            var markdown = editor.getValue();
+            if (markdown.length === 0) {
+                console.log("markdown empty");
+                return;
+            }
+            formDoInput.val("edit");
+            formMdInput.val(markdown);
+            form.submit();
+        });
+
+        // addNoteBtn
+        $("#addNoteBtn").on("click", function(e) {
+            e.preventDefault();
+            var markdown = editor.getValue();
+            if (markdown.length === 0) {
+                console.log("markdown empty");
+                return;
+            }
+            formDoInput.val("add");
+            formMdInput.val(markdown);
+            form.submit();
         });
 
         // cancelNoteBtn
         $("#cancelNoteBtn").on("click", function() {
             formIdInput.prop("value", null);
             editor.setValue(null);
-            formDoInput.prop("value", null);
+            formMdInput.val("");
+            formDoInput.val("add");
             formAddButtons.show();
             formEditBtns.hide();
         });
