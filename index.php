@@ -12,6 +12,7 @@
     <style>
         .textbox {
             border: 1px solid #555;
+            border-top: 3px solid rgb(11, 41, 73); /* Different color for the top border */
             padding: 10px;
             margin-bottom: 10px;
         }
@@ -36,87 +37,110 @@
 require_once("functions.php");
 require_once("config.php");
 $notesFile = "notes.json";
-$notes = getNotes($notesFile);
-$edit  = "";
+$notes     = getNotes($notesFile);
+$edit      = "";
 
-if (isset($_POST['add']) && !empty($_POST['text'])) {
-    $safe_text = htmlspecialchars($_POST['text']);
-    array_push($notes, ["note" => $safe_text, "date" => date("Y-m-d H:i:s")]);
-    $notes_json = json_encode($notes);
-    file_put_contents($notesFile, $notes_json);
-    echo alert("Note added successfully.", "success");
-}
+# NOTE: Form submission
+do {
 
-if (isset($_POST['update']) && !empty($_POST['text'])) {
-    $safe_text = htmlspecialchars($_POST['text']);
-    $notes[$_POST['id']] = ["note" => $safe_text, "date" => date("Y-m-d H:i:s")];
-    $notes_json = json_encode($notes);
-    file_put_contents($notesFile, $notes_json);
-    echo alert("Note updated successfully.", "success");
-    $edit = "";
-    unset($_GET);
-}
+    $do = (!empty($_REQUEST['do']) ? $_REQUEST['do'] : "add");
+    $text   = (!empty($_REQUEST['text']) ? $_REQUEST['text'] : Null);
+    $id     = (!empty($_REQUEST['id']) ? $_REQUEST['id'] : Null);
+    $debug  = "
+        <div id='debugInfo' class='card' style='display:none;'>
+            <h4 class='card-header bg-secondary-subtle'>Debug Info</h4>
+            <div class='card-body'>
+                <pre class='text-primary'>".json_encode($_REQUEST, JSON_PRETTY_PRINT)."</pre>
+            </div>
+        </div>
+    ";
 
-if (isset($_POST['delall']) && !empty($notes)) {
-    echo alert("
-    <h4>".icon('exclamation-triangle')." Are you sure you want to delete <b>all</b> your notes? This cannot be undone!</h4>
-    <hr>
-    <form action='index.php' method='POST'>
-        <button type='submit' class='btn btn-danger' name='delallconfirm'>".icon('trash')." Delete all</button>
-        <a href='index.php' class='btn btn-secondary'>".icon('x-circle')." Cancel</a>
-    </form>", "danger", False);
-}
+    if (!empty($text)) {
+        if ($do == "add") {
+            $safe_text = htmlspecialchars($_REQUEST['text']);
+            array_push($notes, ["note" => $safe_text, "date" => date("Y-m-d H:i:s")]);
+            $notes_json = json_encode($notes);
+            file_put_contents($notesFile, $notes_json);
+            echo alert("Note added successfully.", "success");
+        }
+    
+        if ($do == "edit") {
+            if (empty($id)) {
+                echo alert("No ID provided when editing note.");
+                break;
+            }
+            $safe_text = htmlspecialchars($_REQUEST['text']);
+            $notes[$_REQUEST['id']] = ["note" => $safe_text, "date" => date("Y-m-d H:i:s")];
+            $notes_json = json_encode($notes);
+            file_put_contents($notesFile, $notes_json);
+            echo alert("Note updated successfully.", "success");
+            $edit = "";
+        }
+    }
 
-if (isset($_POST['delallconfirm']) && !empty($notes)) {
-    $notes_json = json_encode([]);
-    file_put_contents($notesFile, $notes_json);
-    echo alert("All notes deleted successfully.", "success");
-}
-
-if (isset($_GET['del'])) {
-    if (!empty($notes[$_GET['del']])){
-        unset($notes[$_GET['del']]);
-        $notes_json = json_encode($notes);
+    if (isset($_REQUEST['delall']) && !empty($notes)) {
+        echo alert("
+        <h4>".icon('exclamation-triangle')." Are you sure you want to delete <b>all</b> your notes? This cannot be undone!</h4>
+        <hr>
+        <form action='index.php' method='POST'>
+            <button type='submit' class='btn btn-danger' name='delallconfirm'>".icon('trash')." Delete all</button>
+            <a href='index.php' class='btn btn-secondary'>".icon('x-circle')." Cancel</a>
+        </form>", "danger", False);
+    }
+    
+    if (isset($_REQUEST['delallconfirm']) && !empty($notes)) {
+        $notes_json = json_encode([]);
         file_put_contents($notesFile, $notes_json);
-        echo alert("Note deleted successfully.", "success");
-    } else {
-        echo alert("Note not found.", "warning");
+        echo alert("All notes deleted successfully.", "success");
     }
-    unset($_GET);
-}
+    
+    if (isset($_REQUEST['del'])) {
+        if (!empty($notes[$_REQUEST['del']])){
+            unset($notes[$_REQUEST['del']]);
+            $notes_json = json_encode($notes);
+            file_put_contents($notesFile, $notes_json);
+            echo alert("Note deleted successfully.", "success");
+        } else {
+            echo alert("Note not found.", "warning");
+        }
+    }
 
-if (isset($_GET['edit'])) {
-    $edit = $notes[$_GET['edit']];
-    if (is_array($edit)) {
-        $edit = $edit['note'];
+    # DEPRECATED: Can be removed in `ace` branch
+    # But we'll keep it anyway for now to be non-js compliant.
+    if (isset($_REQUEST['edit'])) {
+        $edit = $notes[$_REQUEST['edit']];
+        if (is_array($edit)) {
+            $edit = $edit['note'];
+        }
     }
-}
+
+    unset($_REQUEST, $_GET, $_POST, $id, $text, $do);
+
+} while (False);
 ?>
 
-<div class="card">
-    <h3 class="card-header">Notes</h3>
+<?= $debug ?>
+
+<div class="card mt-3">
+    <div class="card-header bg-primary-subtle d-flex justify-content-between">
+        <h3>Notes</h3>
+        <button id="showDebugInfo" class="btn btn-primary"><?= icon("bug") ?></button>
+    </div>
     <div class="card-body">
-        <form action="index.php" method="POST">
+        <form action="index.php" class="noteForm" method="POST">
+            <input type="hidden" name="id" class="noteFormHiddenInput">
+            <input type="hidden" name="do" class="noteFormHiddenInput">
+            <input type="hidden" name="md" class="noteFormHiddenInput">
         <!-- NOTE: textarea -->
-            <textarea class="form-control" name="text" id="text" cols="30" rows="10">
-                <?= $edit ?>
-            </textarea>
+            <div id="text"><?= $edit ?></div>
             <br>
-            <div class="btn-group">
-                <?php
-                if (isset($_GET['edit'])) {
-                    echo "
-                    <input type='hidden' name='id' value='$_GET[edit]'>
-                    <input type='hidden' name='update' value='1'>
-                    <button type='submit' class='btn btn-success'>".icon('floppy')." Update</button>
-                    <a href='index.php' class='btn btn-secondary'>".icon('x-circle')." Cancel</a>";
-                } else {
-                    echo "
-                    <input type='hidden' name='add' value='1'>
-                    <button type='submit' class='btn btn-success'>".icon('plus-circle')." Add</button>
-                    <button type='submit' class='btn btn-danger' name='delall'>".icon('trash')." Delete all</button>";
-                }
-                ?>
+            <div id="formAddButtons" class="btn-group formBtnGroup" style="display:none;">
+                <button type='submit' class='btn btn-success'><?= icon('plus-circle') ?> Add</button>
+                <button type='submit' class='btn btn-danger' name='delall'><?= icon('trash') ?> Delete all</button>
+            </div>
+            <div id="formEditButtons" class="btn-group formBtnGroup" style="display:none;">
+                <button type='submit' id='updateNoteBtn' class='btn btn-success'><?= icon('floppy') ?> Update</button>
+                <button type='button' id='cancelNoteBtn' class='btn btn-secondary'><?= icon('x-circle') ?> Cancel</button>
             </div>
         </form>
     </div>
@@ -137,14 +161,15 @@ if (!empty($notes)) {
             $value = str_replace("\n", "\n\n", $value);
         }
         echo "
-        <div class='textbox'>
+        <div class='textbox' data-id='$key'>
             <div class='d-flex justify-content-between'>
                 <div class='md'>$note</div>
+                <div class='markdownCode' style='display:none;'>$note</div>
                 ".(!empty($date) ? "<div class='text-muted' title='$date'>".relativeTime($date)."</div>" : "")."
             </div>
             <hr>
             <div class='btn-group'>
-                <a href='?edit=$key' class='btn btn-primary'>".icon("pen")." Edit</a>
+                <a href='?edit=$key' class='btn btn-primary editNote'>".icon("pen")." Edit</a>
                 <a href='?del=$key' class='btn btn-danger'>".icon('trash')." Delete</a>
             </div>
         </div>";
@@ -158,38 +183,113 @@ if (!empty($notes)) {
 
 <script>
 
-// Initialize Ace editor
-var editor = ace.edit("text");
-editor.setTheme("ace/theme/monokai");
-editor.session.setMode("ace/mode/markdown");
-editor.setOptions({
-    maxLines: Infinity,
-    wrap: true,
+    // Initialize Ace editor
+    const editor = ace.edit("text");
+    // editor.setTheme("ace/theme/monokai");
+    // editor.session.setMode("ace/mode/markdown");
+    editor.setOptions({
+        theme                 : "ace/theme/monokai",
+        mode                  : "ace/mode/markdown",
+        maxLines              : Infinity,
+        wrap                  : true,
+        minLines              : 20,
+        tabSize               : 2,
+        fontSize              : "1.5rem",
         copyWithEmptySelection: true,
-});
+        enableAutoIndent      : true,
+    });
 
-// Submit form with Ctrl+Enter
-$("#text").keydown(function(event) {
-    if (event.ctrlKey && event.key === 'Enter') {
-        event.preventDefault();
-        $("#text").closest('form').submit();
-    }
-});
+    // NOTE: document.ready
+    $(document).ready(function() {
 
-$(".md").each(function() {
-    showdownOpts = {
-        tables: true,
-        strikethrough: true,
-        tasklists: true,
-        simpleLineBreaks: true,
-        openLinksInNewWindow: true,
-        emoji: true,
-        parseImgDimensions: true,
-        simplifiedAutoLink: true,
-    };
-    var converter = new showdown.Converter(showdownOpts),
-        text      = $(this).text(),
-        html      = converter.makeHtml(text);
-    $(this).html(html);
-});
+        // REVIEW: This doesn't work with Ace editor.
+        // Submit form with Ctrl+Enter
+        // $("#text").keydown(function(event) {
+        //     event.preventDefault();
+        //     if (event.ctrlKey && event.key === 'Enter') {
+        //         event.preventDefault();
+        //         $("#text").closest('form').submit();
+        //     }
+        // });
+        editor.commands.addCommand({
+            name   : 'submit',
+            bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
+            exec   : function(editor) {
+                $("#updateNoteBtn").click();
+            }
+        });
+
+        $(".md").each(function() {
+            showdownOpts = {
+                tables               : true,
+                strikethrough        : true,
+                tasklists            : true,
+                simpleLineBreaks     : true,
+                openLinksInNewWindow : true,
+                emoji                : true,
+                parseImgDimensions   : true,
+                simplifiedAutoLink   : true,
+            };
+            var converter = new showdown.Converter(showdownOpts),
+                text      = $(this).text(),
+                html      = converter.makeHtml(text);
+            $(this).html(html);
+        });
+
+        /* ────────────────────────────────────────────────────────────────────────── */
+        /*                                    FORM                                    */
+        /* ────────────────────────────────────────────────────────────────────────── */
+        const form           = $(".noteForm");
+        const formIdInput    = form.find("input[name='id']").prop("value", null);
+        const formDoInput    = form.find("input[name='do']").val("add");
+        const formMdInput    = form.find("input[name='md']").val("");
+        const formEditBtns   = form.find("#formEditButtons");
+        const formAddButtons = form.find("#formAddButtons").show();
+
+        $(".editNote").on("click", function(e) {
+            e.preventDefault();
+            var thisTextbox    = $(this).parents().closest(".textbox");
+            var id             = thisTextbox.data("id");
+            var markdownCode   = thisTextbox.find(".markdownCode").text();
+            console.log(`Editing note #${id}`);
+            
+            if (markdownCode.length === 0) {
+                console.log("Empty .markdownCode");
+                return;
+            }
+            if (typeof id !== 'undefined' && Number.isInteger(parseInt(id))) {
+                // id is set and is an integer
+            }
+
+            formIdInput.val(id);
+            formDoInput.val("edit");
+            editor.setValue(markdownCode);
+            formEditBtns.show();
+            formAddButtons.hide();
+        });
+
+        // updateNoteBtn
+        $("updateNoteBtn").on("click", function() {
+            var editorText = editor.getValue();
+            formMdInput.val(editorText);
+        });
+
+        // cancelNoteBtn
+        $("#cancelNoteBtn").on("click", function() {
+            formIdInput.prop("value", null);
+            editor.setValue(null);
+            formDoInput.prop("value", null);
+            formAddButtons.show();
+            formEditBtns.hide();
+        });
+
+        // DebugInfo
+        $("#showDebugInfo").on("click", function() {
+            console.log("Toggling #debugInfo")
+            $("#debugInfo").toggle();
+        });
+
+
+    }); // end document.ready
+
 </script>
