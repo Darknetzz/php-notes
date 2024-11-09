@@ -12,7 +12,7 @@
     <style>
         .textbox {
             border: 1px solid #555;
-            border-top: 3px solid rgb(11, 41, 73); /* Different color for the top border */
+            border-top: 3px solid rgb(47, 111, 179); /* Different color for the top border */
             padding: 10px;
             margin-bottom: 10px;
         }
