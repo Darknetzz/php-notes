@@ -11,14 +11,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
     <style>
         .textbox {
-            border: 1px solid #555;
             border-top: 3px solid rgb(47, 111, 179); /* Different color for the top border */
             padding: 10px;
             margin-bottom: 10px;
         }
+        .textbox-inner {
+            /* border: 1px solid #555; */
+            display: block;
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+        }
         .text {
             min-height: 200px;
-        
         }
     </style>
 
@@ -152,16 +157,24 @@ if (!empty($notes)) {
             $value = str_replace("\n", "\n\n", $value);
         }
         echo "
-        <div class='textbox' data-id='$key'>
+        <div class='textbox bg-secondary-subtle' data-id='$key'>
             <div class='d-flex justify-content-between'>
-                <div class='md'>$note</div>
+                <div class='textbox-inner'>
+                    <div class='md'>$note</div>
+                </div>
                 <div class='markdownCode' style='display:none;'>$note</div>
-                ".(!empty($date) ? "<div class='text-muted' title='$date'>".relativeTime($date)."</div>" : "")."
+                <div class='text-muted' title='$date'>
+                    [#$key]
+                    ".(!empty($date) ? relativeTime($date) : "Unknown")."
+                </div>
             </div>
             <hr>
-            <div class='btn-group'>
-                <a href='?edit=$key' class='btn btn-primary editNote'>".icon("pen")." Edit</a>
-                <a href='?del=$key' class='btn btn-danger'>".icon('trash')." Delete</a>
+            <div class='d-flex justify-content-between'>
+                    <a href='?edit=$key' class='btn btn-primary editNote'>".icon("pen")." Edit</a>
+                <form method='POST'>
+                    <input type='hidden' name='del' value='$key'>
+                    <a href='?del=$key' class='btn btn-danger'>".icon('trash')." Delete</a>
+                </form>
             </div>
         </div>";
     }
@@ -227,6 +240,18 @@ if (!empty($notes)) {
             $(this).html(html);
         });
 
+        // Checkboxes
+        const checkboxes     = $("input[type=checkbox]").prop("disabled", false);
+        checkboxes.on("click", function() {
+            checkbox = $(this);
+            textbox  = checkbox.closest(".textbox");
+            listItem = checkbox.closest(".task-list-item").wrap("<label class='checkbox-label'></label>");
+            noteid   = checkbox.closest(".textbox").data("id");
+            checked = (checkbox.prop("checked") ? true : false);
+            checkbox.prop("checked", checked);
+            console.log("check for "+noteid+" = "+checked)
+        });
+
         /* ────────────────────────────────────────────────────────────────────────── */
         /*                                    FORM                                    */
         /* ────────────────────────────────────────────────────────────────────────── */
@@ -236,7 +261,6 @@ if (!empty($notes)) {
         const formMdInput    = form.find("input[name='md']");
         const formEditBtns   = form.find("#formEditButtons");
         const formAddButtons = form.find("#formAddButtons").show();
-
 
         console.log("formIdInput: " + formIdInput.length);
         console.log("formDoInput: " + formDoInput.length);
@@ -262,6 +286,9 @@ if (!empty($notes)) {
             editor.setValue(markdownCode);
             formEditBtns.show();
             formAddButtons.hide();
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $("#text").offset().top
+            }, 500);
         });
 
         // updateNoteBtn
@@ -305,7 +332,6 @@ if (!empty($notes)) {
             console.log("Toggling #debugInfo")
             $("#debugInfo").toggle();
         });
-
 
     }); // end document.ready
 
