@@ -1,11 +1,4 @@
-# php-notes-json
-
-php-notes-json was the first version of php-notes.
-
-All notes are stored in a simple JSON file.
-I would recommend using php-notes-simple instead (using markdown files).
-
-This branch is now read-only.
+# php-notes-ace
 
 ---
 

@@ -4,11 +4,14 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NOTES</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.7/purify.min.js" integrity="sha512-78KH17QLT5e55GJqP76vutp1D2iAoy06WcYBXB6iBCsmO6wWzx0Qdg8EDpm8mKXv68BcvHOyeeP4wxAL0twJGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js" integrity="sha512-V6rGY7jjOEUc7q5Ews8mMlretz1Vn2wLdMW/qgABLWunzsLfluM0FwHuGjGQ1lc8jO5vGpGIGFE+rTzB+63HdA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
         .textbox {
             border-top: 3px solid rgb(47, 111, 179); /* Different color for the top border */
@@ -29,8 +32,10 @@
 
 
     <!-- Ace editor -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.4/ace.min.js"></script>
-    <link href=" https://cdn.jsdelivr.net/npm/ace-builds@1.36.4/css/ace.min.css " rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.43.3/src-noconflict/ace.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/ace-builds@1.43.3/css/ace.min.css" rel="stylesheet">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.4/ace.min.js"></script> -->
+    <!-- <link href=" https://cdn.jsdelivr.net/npm/ace-builds@1.36.4/css/ace.min.css " rel="stylesheet"> -->
 
 </head>
 
@@ -117,10 +122,13 @@ do {
 
 <?= $debug ?>
 
-<div class="card mt-3">
+<div class="card mt-3 border border-primary">
     <div class="card-header bg-primary-subtle d-flex justify-content-between">
         <h3>Notes</h3>
-        <button id="showDebugInfo" class="btn btn-primary"><?= icon("bug") ?></button>
+        <div>
+            <button id="showDebugInfo" class="btn btn-warning"><?= icon("bug") ?></button>
+            <button id="showInfo" class="btn btn-primary"><?= icon("info") ?></button>
+        </div>
     </div>
     <div class="card-body">
         <form action="index.php" class="noteForm" method="POST">
