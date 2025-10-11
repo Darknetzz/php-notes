@@ -127,7 +127,7 @@ do {
         <h3>Notes</h3>
         <div>
             <button id="showDebugInfo" class="btn btn-warning"><?= icon("bug") ?></button>
-            <button id="showInfo" class="btn btn-primary"><?= icon("info") ?></button>
+            <button id="showInfo" class="btn btn-primary"><?= icon("gear-wide-connected") ?></button>
         </div>
     </div>
     <div class="card-body">
