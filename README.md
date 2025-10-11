@@ -17,4 +17,5 @@ https://<YOUR_SERVER>/notes
 ![292658210-162e649d-84e9-4054-b660-184ad7474d3d](https://github.com/Darknetzz/php-notes-simple/assets/42413477/26e9dde9-7334-4cc1-93f2-4a8c994902e3)
 
 
-Thanks to https://showdownjs.com for markdown support!
+Thanks to https://marked.js.org/ for markdown support!
+Thanks to https://ace.c9.io/ for code editor!

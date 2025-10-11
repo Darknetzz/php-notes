@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.7/purify.min.js" integrity="sha512-78KH17QLT5e55GJqP76vutp1D2iAoy06WcYBXB6iBCsmO6wWzx0Qdg8EDpm8mKXv68BcvHOyeeP4wxAL0twJGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js" integrity="sha512-V6rGY7jjOEUc7q5Ews8mMlretz1Vn2wLdMW/qgABLWunzsLfluM0FwHuGjGQ1lc8jO5vGpGIGFE+rTzB+63HdA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -231,21 +231,28 @@ if (!empty($notes)) {
             }
         });
 
+        // $(".md").each(function() {
+        //     showdownOpts = {
+        //         tables               : true,
+        //         strikethrough        : true,
+        //         tasklists            : true,
+        //         simpleLineBreaks     : true,
+        //         openLinksInNewWindow : true,
+        //         emoji                : true,
+        //         parseImgDimensions   : true,
+        //         simplifiedAutoLink   : true,
+        //     };
+        //     var converter = new showdown.Converter(showdownOpts),
+        //         text      = $(this).text(),
+        //         html      = converter.makeHtml(text);
+        //     $(this).html(html);
+        // });
+
         $(".md").each(function() {
-            showdownOpts = {
-                tables               : true,
-                strikethrough        : true,
-                tasklists            : true,
-                simpleLineBreaks     : true,
-                openLinksInNewWindow : true,
-                emoji                : true,
-                parseImgDimensions   : true,
-                simplifiedAutoLink   : true,
-            };
-            var converter = new showdown.Converter(showdownOpts),
-                text      = $(this).text(),
-                html      = converter.makeHtml(text);
-            $(this).html(html);
+            currentText       = $(this).text();
+            currentTextParsed = marked.parse(currentText);
+
+            $(this).html(DOMPurify.sanitize(currentTextParsed))
         });
 
         // Checkboxes
